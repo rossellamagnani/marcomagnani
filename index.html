@@ -174,6 +174,9 @@
   .lv-info p { margin: 0; font-size: 0.9rem; }
   .lv-info .lv-desc { margin-top: 14px; max-width: 56ch; }
   .lv-info .lv-desc p { margin: 0 0 0.8em; line-height: 1.65; color: #4a4a48; }
+  .lv-info .lv-rest[hidden] { display: none; }
+  .lv-info .lv-more { margin: 0 0 0.8em; padding: 0; border: 0; background: none; font: inherit; font-size: 0.85rem; color: var(--ink); cursor: pointer; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+  .lv-info .lv-more:hover { text-decoration-thickness: 2px; }
   .lv-info .lv-mount { margin-top: 2px; font-size: 0.85rem; line-height: 1.55; color: var(--ink-soft); max-width: 56ch; }
   .lv-info .lv-cta { margin-top: 12px; align-self: flex-start; color: var(--ink); font-size: 0.85rem; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
   .lv-info .lv-cta:hover { text-decoration-thickness: 2px; }
@@ -227,7 +230,8 @@
   .sheet.open { opacity: 1; visibility: visible; transition: opacity .4s ease; }
   .sheet-inner { min-height: 100%; border-bottom: 1px solid var(--ink); }
   .sheet .lv-art { min-height: calc(100vh - var(--header-h) - env(safe-area-inset-top, 0px)); min-height: calc(100dvh - var(--header-h) - env(safe-area-inset-top, 0px)); }
-  .sheet .lv-info { padding-top: clamp(64px, 10vh, 110px); }
+  .sheet .lv-info { padding-top: clamp(64px, 10vh, 110px); justify-content: flex-start; }
+  .sheet .lv-art { align-self: start; position: sticky; top: 0; }
   .sheet .info { opacity: 0; transform: translateY(10px); transition: opacity .25s ease, transform .25s ease; }
   .sheet.open .info { opacity: 1; transform: none; transition: opacity .55s ease .18s, transform .75s cubic-bezier(.22,.8,.25,1) .18s; }
   .art-box.parked { visibility: hidden; }
@@ -268,7 +272,7 @@
 
   /* schermi stretti o verticali: opera in alto, scheda sotto */
   @media (max-width: 760px), (max-aspect-ratio: 1/1) {
-    .sheet .lv-art { min-height: 0; padding: 40px 24px; }
+    .sheet .lv-art { min-height: 0; padding: 40px 24px; position: static; }
     .sheet .lv-info { padding-top: 32px; }
     .caption .title { font-size: 1rem; }
     :root { --art-vh: 42vh; }
@@ -851,6 +855,31 @@
     out.q.copy(dummy.quaternion);
   }
 
+  // le prime frasi sempre visibili, il resto (anche dello stesso paragrafo) dietro "Leggi tutto"
+  function descParts(paras) {
+    const mk = t => { const p = document.createElement("p"); p.textContent = t; return p; };
+    const sent = paras[0].match(/[^.!?]+[.!?]+(?:\s+|$)/g) || [paras[0]];
+    let head = "", k = 0;
+    while (k < sent.length && (head.length < 150 || k === 0)) head += sent[k++];
+    const tail = sent.slice(k).join("");
+    if (!tail.trim() && paras.length === 1) return [mk(paras[0])];
+    const first = mk(head.trimEnd());
+    const more = document.createElement("span");
+    more.className = "lv-rest"; more.hidden = true; more.textContent = " " + tail.trim();
+    if (tail.trim()) first.append(more);
+    const rest = paras.slice(1).map(t => { const p = mk(t); p.className = "lv-rest"; p.hidden = true; return p; });
+    const btn = document.createElement("button");
+    btn.type = "button"; btn.className = "lv-more"; btn.textContent = "Leggi tutto";
+    btn.setAttribute("aria-expanded", "false");
+    btn.addEventListener("click", () => {
+      const open = btn.getAttribute("aria-expanded") !== "true";
+      more.hidden = !open; rest.forEach(p => { p.hidden = !open; });
+      btn.textContent = open ? "Riduci" : "Leggi tutto";
+      btn.setAttribute("aria-expanded", String(open));
+    });
+    return [first, ...rest, btn];
+  }
+
   function fillSheet(w, base) {
     artBox.style.background = `#8f8f8f url("${w.img}") center / cover no-repeat`;
     artBox.textContent = "";
@@ -860,7 +889,7 @@
     document.getElementById("sheetSize").textContent = w.tech;
     document.getElementById("sheetMount").textContent = w.mount;
     document.getElementById("sheetMount").hidden = !w.mount;
-    document.getElementById("sheetDesc").replaceChildren(...w.desc.map(t => { const p = document.createElement("p"); p.textContent = t; return p; }));
+    document.getElementById("sheetDesc").replaceChildren(...descParts(w.desc));
     const ratio = w.w / w.h;
     artBox.style.aspectRatio = `${w.w} / ${w.h}`;
     const maxH = innerWidth / innerHeight < 1 || innerWidth <= 760 ? "42vh" : "62vh";
@@ -1172,7 +1201,7 @@
         el("p", null, w.tech)
       );
       const desc = el("div", "lv-desc");
-      desc.append(...w.desc.map(t => el("p", null, t)));
+      desc.append(...descParts(w.desc));
       info.append(desc);
       if (w.mount) info.append(el("p", "lv-mount", w.mount));
       if (w.avail) {
