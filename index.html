@@ -172,7 +172,9 @@
   .lv-info .lv-kicker { font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft); margin: 0; }
   .lv-info h3, .lv-info h2 { margin: 0 0 6px; font-size: 1rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; }
   .lv-info p { margin: 0; font-size: 0.9rem; }
-  .lv-info .lv-desc { margin-top: 10px; line-height: 1.65; color: #4a4a48; max-width: 52ch; }
+  .lv-info .lv-desc { margin-top: 14px; max-width: 56ch; }
+  .lv-info .lv-desc p { margin: 0 0 0.8em; line-height: 1.65; color: #4a4a48; }
+  .lv-info .lv-mount { margin-top: 2px; font-size: 0.85rem; line-height: 1.55; color: var(--ink-soft); max-width: 56ch; }
   .lv-info .lv-cta { margin-top: 12px; align-self: flex-start; color: var(--ink); font-size: 0.85rem; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
   .lv-info .lv-cta:hover { text-decoration-thickness: 2px; }
   .lv-info .lv-sold { margin-top: 12px; font-size: 0.85rem; color: var(--ink-soft); }
@@ -377,9 +379,8 @@
       <p class="lv-kicker" id="sheetSeries"></p>
       <h2 id="sheetTitle"></h2>
       <p id="sheetSize"></p>
-      <p>Olio su tela</p>
-      <p id="sheetMount"></p>
-      <p class="lv-desc" id="sheetDesc"></p>
+      <div class="lv-desc" id="sheetDesc"></div>
+      <p class="lv-mount" id="sheetMount"></p>
       <div id="sheetActions"></div>
     </div>
   </div>
@@ -392,44 +393,58 @@
 <script>
 (() => {
   // ---------- Opere (testi dal sito attuale; immagini ancora segnaposto) ----------
-  const NOFRAME = "Tela a spessore, bordo dipinto, senza cornice";
-  const FLOAT = "Cornice artigianale in legno, montaggio floating";
-  const GRID = "Parte del polittico a griglia di quattro elementi";
   const works = [
-    { s: "Trame", t: "Trama I", w: 40, h: 40, d: 2, frame: false, mount: GRID, avail: true,
-      desc: "L'opera apre la serie impostando la prima nota sensoriale attraverso la tonalità del rosa antico. Al rigore della trama traforata che cinge la fronte fa da contrappunto la modulazione chiaroscurale del volto, rigato dal dettaglio plastico delle lacrime che catturano e rifrangono la luce." },
-    { s: "Gatti Pop", t: "Gatto Pop I", w: 20, h: 20, d: 3.8, frame: false, mount: NOFRAME, avail: true,
-      desc: "Un accordo cromatico quasi monocromatico, in cui la silhouette del felino emerge da un fondo della medesima tonalità azzurra. L'inserto dorato sul muso e la luminosità controllata dello sguardo sono le uniche coordinate di rottura visiva." },
-    { s: "Trame del silenzio", t: "Vista", w: 40, h: 40, d: 2, frame: false, mount: FLOAT, avail: true,
-      desc: "L'oscuramento dello sguardo diventa la condizione necessaria per accedere alla visione interiore. Il ricamo vermiglio cinge gli occhi della figura, interrompendo la dinamica del giudizio e della pura osservazione quotidiana." },
-    { s: "Gatti Kintsugi", t: "Gatto Kintsugi I", w: 20, h: 20, d: 3.8, frame: false, mount: NOFRAME, avail: true,
-      desc: "Il corpo del felino è risolto attraverso una stesura rosso scuro, profonda e materica, su cui si innesta la ramificazione dorata. Le fratture ridisegnano la muscolatura del soggetto, che emerge da un fondo turchese saturo e assoluto." },
-    { s: "Pietre", t: "Pietra viva", w: 80, h: 120, d: 2, frame: false, mount: FLOAT, avail: true,
-      desc: "Uno studio ispirato alla maestria scultorea di Coderch & Malavia: l'immobilità della posa si trasforma in una tensione vibrante. Il confine tra roccia e pelle svanisce: non è più solo pietra, ma non è ancora completamente carne." },
-    { s: "Trame", t: "Trama II", w: 40, h: 40, d: 2, frame: false, mount: GRID, avail: true,
-      desc: "La figura si raccoglie lungo la diagonale definita dal gesto intimo della mano. La trama si appropria di un blu intenso e profondo; il rilievo e il nodo del pizzo, premuti contro la pelle, attutiscono il rumore del mondo esterno." },
-    { s: "Gatti Pop", t: "Gatto Pop II", w: 20, h: 20, d: 3.8, frame: false, mount: NOFRAME, avail: true,
-      desc: "Il manto del felino è una stesura fucsia vibrante e satura, che si staglia contro l'oscurità di un fondo nero opaco. La foglia d'oro sul naso sigilla la composizione." },
-    { s: "Trame del silenzio", t: "Ascolto", w: 40, h: 40, d: 2, frame: false, mount: FLOAT, avail: true,
-      desc: "La fibra materica avvolge i padiglioni auricolari, isolando la fisionomia dalle interferenze del reale. Zittire la frequenza del contingente per sintonizzare la coscienza su un'eco più profonda, intima e monumentale." },
-    { s: "Gatti Kintsugi", t: "Gatto Kintsugi II", w: 20, h: 20, d: 3.8, frame: false, mount: NOFRAME, avail: false,
-      desc: "Uno studio sul valore plastico del bianco: il manto è modellato con passaggi millimetrici di bianchi caldi e grigi, in contrasto con la nitidezza delle fratture dorate, su un fondo nero opaco." },
-    { s: "Trame", t: "Trama III", w: 40, h: 40, d: 2, frame: false, mount: GRID, avail: true,
-      desc: "La fibra si tinge di un verde desaturato, una temperatura emotiva riflessiva e distante. La leggera torsione di profilo amplifica il peso del tessuto sulla fronte, diaframma tra il visibile e il celato." },
-    { s: "Gatti Pop", t: "Gatto Pop III", w: 20, h: 20, d: 3.8, frame: false, mount: NOFRAME, avail: true,
-      desc: "Il dialogo tra la profondità del blu cobalto e la preziosità di uno sfondo in oro, che rifrange la luce in modo cangiante e cambia l'opera a seconda dell'angolo di osservazione." },
-    { s: "Trame del silenzio", t: "Parola", w: 40, h: 40, d: 2, frame: false, mount: FLOAT, avail: true,
-      desc: "Le labbra vengono racchiuse e protette dal manufatto rosso, congelando l'atto della comunicazione verbale. L'immobilità della bocca diventa un presidio di pura resistenza spirituale." },
-    { s: "Gatti Kintsugi", t: "Gatto Kintsugi III", w: 20, h: 20, d: 3.8, frame: false, mount: NOFRAME, avail: false,
-      desc: "Il profilo del felino è risolto in un nero profondo che assorbe la luce e la restituisce solo lungo le fenditure dorate, contro una campitura metallica." },
-    { s: "Trame", t: "Trama IV", w: 40, h: 40, d: 2, frame: false, mount: GRID, avail: true,
-      desc: "La trama si fa ocra caldo e vibrante. Il volto riceve una luminosità zenitale e lo sguardo ieratico stabilisce l'ultimo contatto diretto con lo spettatore, sigillando la griglia." },
-    { s: "Gatti Pop", t: "Gatto Pop IV", w: 20, h: 20, d: 3.8, frame: false, mount: NOFRAME, avail: true,
-      desc: "Il bianco puro modella il corpo del felino attraverso grigi intermedi e bianchi caldi, staccandolo da uno sfondo blu notte profondo. L'inserto dorato sul muso dialoga con la radiosità dello sguardo." },
-    { s: "Trame del silenzio", t: "Libertà", w: 60, h: 75, d: 2, frame: false, mount: FLOAT, avail: true,
-      desc: "Lo sguardo si solleva e le mani stringono i fili dell'intreccio, governandone la direzione. La figura cessa di essere confinata dal limite e ne assume il controllo: il vincolo scarlatto diventa lo strumento del proprio potere interiore." },
-    { s: "Gatti Kintsugi", t: "Gatto Kintsugi IV", w: 20, h: 20, d: 3.8, frame: false, mount: NOFRAME, avail: true,
-      desc: "Il felino è vestito di un blu oltremare solcato da trame dorate, su uno sfondo arancione saturo: il contrasto complementare portato al massimo." }
+    { s: "Trame", t: "Trama I", w: 40, h: 40, d: 2, frame: false, mount: "L'opera è concepita come parte integrante di un polittico a griglia e viene presentata all'interno della serie completa dei quattro elementi.", avail: true,
+      tech: "Olio su tela, 40 × 40 cm",
+      desc: ["L'opera apre la serie impostando la prima nota sensoriale attraverso la tonalità del rosa antico. Qui, la memoria ancestrale legata al contatto e alla cura trova la sua espressione più solenne ed evocativa. Al rigore della trama traforata che cinge la fronte fa da contrappunto la modulazione chiaroscurale del volto, rigato dal dettaglio plastico delle lacrime che catturano e rifrangono la luce. La figura si fa archetipo di una vulnerabilità protetta, avviando quel rallentamento del battito visivo che caratterizza l'intero impianto modulare del ciclo."] },
+    { s: "Gatti Pop", t: "Gatto Pop I", w: 20, h: 20, d: 3.8, frame: false, mount: "Olio su tela a spessore, concepita per l'esposizione senza cornice.", avail: true,
+      tech: "Olio su tela, 20 × 20 × 3.8 cm",
+      desc: ["L'opera si struttura su un accordo cromatico quasi monocromatico, in cui la silhouette del felino emerge da un fondo coordinato della medesima tonalità azzurra. Marco Magnani annulla il contrasto tonale di sfondo per concentrarsi unicamente sulle variazioni chiaroscurali che scolpiscono il volume e la muscolatura del soggetto.", "L'inserto dorato sul muso e la luminosità controllata dello sguardo fungono da uniche coordinate di rottura visiva, definendo un'opera di assoluta freschezza e rigore geometrico."] },
+    { s: "Trame del silenzio", t: "Vista", w: 40, h: 40, d: 2, frame: false, mount: "L'opera è completata da una cornice artigianale in legno con montaggio floating, concepita per valorizzare la tela.", avail: true,
+      tech: "Olio su tela, 40 × 40 cm",
+      desc: ["L’oscuramento dello sguardo diventa la condizione necessaria per accedere alla visione interiore. In questo capitolo della serie, la complessità geometrica del ricamo vermiglio cinge gli occhi della figura, interrompendo la dinamica del giudizio e della pura osservazione quotidiana. Questo ostacolo visivo si trasmuta in un invito a guardare verso l’interno, in un luogo sospeso dove l'assenza di stimoli ed immagini esterne libera la reale densità del pensiero."] },
+    { s: "Gatti Kintsugi", t: "Gatto Kintsugi I", w: 20, h: 20, d: 3.8, frame: false, mount: "Olio su tela a spessore, concepita per l'esposizione senza cornice.", avail: true,
+      tech: "Olio su tela, 20 × 20 × 3.8 cm",
+      desc: ["L'opera apre il ciclo impostando una forte tensione cromatica. Il corpo del felino è risolto attraverso una stesura rosso scuro, profonda e materica, su cui si innesta la ramificazione dorata. Le fratture ridisegnano la muscolatura del soggetto, che emerge per netto contrasto volumetrico da un fondo turchese saturo e assoluto. Il dialogo tra toni caldi e freddi azzera la componente aneddotica, focalizzando l'attenzione sul rigore della linea."] },
+    { s: "Pietre", t: "Pietra viva", w: 80, h: 120, d: 2, frame: false, mount: "", avail: true,
+      tech: "Olio su tela, 80 × 120 cm",
+      desc: ["Attraverso uno studio profondo ispirato alla maestria scultorea di Coderch & Malavia, l’immobilità della posa si trasforma in una tensione vibrante che sfida il tempo. Partendo dal rigore della forma plastica, l’artista cerca di scioglierne la rigidità: il corpo resta raccolto, quasi trattenuto, ma il colore lo attraversa e lo divide, rendendolo instabile.", "In questo equilibrio fragile, il confine tra roccia e pelle svanisce: non è più solo pietra, ma non è ancora completamente carne. Una fusione magnetica tra la solidità della materia e la delicatezza del figurativo che domina lo spazio con grazia e presenza scenica. Presentata con cornice artigianale \"floating\"."] },
+    { s: "Trame", t: "Trama II", w: 40, h: 40, d: 2, frame: false, mount: "L'opera è concepita come parte integrante di un polittico a griglia e viene presentata all'interno della serie completa dei quattro elementi.", avail: true,
+      tech: "Olio su tela, 40 × 40 cm",
+      desc: ["Nel secondo passaggio del polittico, la figura abbandona la rigidità verticale per raccogliersi lungo la diagonale definita dal gesto intimo della mano, che sostiene il volto in un momento di assoluta stasi. La trama si appropria qui di un blu intenso e profondo, trasformando la fibra in un conduttore di stati d'animo ipnotici. Il rilievo e il nodo del pizzo, premuti contro la pelle, attutiscono il rumore del mondo esterno e invitano l'osservatore a \"toccare con lo sguardo\" una superficie posta a protezione dell'intimità del soggetto."] },
+    { s: "Gatti Pop", t: "Gatto Pop II", w: 20, h: 20, d: 3.8, frame: false, mount: "Olio su tela a spessore, concepita per l'esposizione senza cornice.", avail: true,
+      tech: "Olio su tela, 20 × 20 × 3.8 cm",
+      desc: ["Un impianto visivo di forte impatto volumetrico e netto contrasto. In questa tavola, il manto del felino è risolto attraverso una stesura fucsia vibrante e satura, che si staglia con assoluta precisione contro l'oscurità profonda di un fondo nero opaco. La scelta di azzerare la luminosità retrostante monumentalizza la silhouette, trasformando il ritratto in un punto di pura energia cromatica.", "Il dettaglio geometrico della foglia d'oro sul naso sigilla la composizione conferendole una solennità geometrica."] },
+    { s: "Trame del silenzio", t: "Ascolto", w: 40, h: 40, d: 2, frame: false, mount: "L'opera è completata da una cornice artigianale in legno con montaggio floating, concepita per valorizzare la tela.", avail: true,
+      tech: "Olio su tela, 40 × 40 cm",
+      desc: ["La purificazione dell'ascolto si compie attraverso la ricerca del silenzio assoluto. La fibra materica avvolge i padiglioni auricolari, isolando la fisionomia dalle interferenze e dalle distrazioni del reale. Non si tratta di una privazione subìta, ma di una scelta catartica: zittire la frequenza del contingente per sintonizzare la coscienza su un’eco più profonda, intima e monumentale."] },
+    { s: "Gatti Kintsugi", t: "Gatto Kintsugi II", w: 20, h: 20, d: 3.8, frame: false, mount: "Olio su tela a spessore, concepita per l'esposizione senza cornice.", avail: false,
+      tech: "Olio su tela, 20 × 20 × 3.8 cm",
+      desc: ["Uno studio analitico sul valore plastico del bianco e sulla sottrazione cromatica. Il manto del gatto è modellato attraverso passaggi millimetrici di bianchi caldi e grigi intermedi, creando un volume morbido che contrasta con la nitidezza delle fratture dorate. La figura emerge dalla severità monocroma di un fondo nero opaco, che annulla ogni coordinata spaziale per monumentalizzare lo sguardo ieratico e la postura composta del felino."] },
+    { s: "Trame", t: "Trama III", w: 40, h: 40, d: 2, frame: false, mount: "L'opera è concepita come parte integrante di un polittico a griglia e viene presentata all'interno della serie completa dei quattro elementi.", avail: true,
+      tech: "Olio su tela, 40 × 40 cm",
+      desc: ["In questa terza variazione, la fibra si tinge di un verde desaturato, una temperatura emotiva riflessiva e distante. La leggera torsione di profilo della figura amplifica la percezione fisica e il peso del tessuto sulla fronte, evidenziando la funzione del copricapo come diaframma tra il visibile e il celato. Le zone d'ombra che si posano sui lineamenti del volto testimoniano la capacità della materia densa di filtrare la luce e il respiro, esasperando la tensione tra la morbidezza apparente dell'intreccio e la fredda staticità del pigmento."] },
+    { s: "Gatti Pop", t: "Gatto Pop III", w: 20, h: 20, d: 3.8, frame: false, mount: "Olio su tela a spessore, concepita per l'esposizione senza cornice.", avail: true,
+      tech: "Olio su tela, 20 × 20 × 3.8 cm",
+      desc: ["L'opera indaga il dialogo tra la profondità del blu cobalto e la preziosità metallica dello sfondo. Marco Magnani isola il profilo del gatto immettendolo all'interno di una campitura in oro che rifrange la luce circostante in modo cangiante, modificando la percezione dell'opera a seconda dell'angolo di osservazione.", "La densità del pigmento blu del manto agisce in perfetta contrapposizione complementare con la texture metallica dello sfondo, risolvendo il dipinto in una sintesi di grande spessore materico."] },
+    { s: "Trame del silenzio", t: "Parola", w: 40, h: 40, d: 2, frame: false, mount: "L'opera è completata da una cornice artigianale in legno con montaggio floating, concepita per valorizzare la tela.", avail: true,
+      tech: "Olio su tela, 40 × 40 cm",
+      desc: ["Il sigillo della parola restituisce al volto la sacralità della stasi. Le labbra vengono racchiuse e protette dal manufatto rosso, congelando l'atto della comunicazione verbale e del consumo. L'interruzione del discorso costringe la figura a rinunciare a qualsiasi aneddoto o espressione superficiale, trasformando l'immobilità della bocca in un presidio di pura resistenza spirituale."] },
+    { s: "Gatti Kintsugi", t: "Gatto Kintsugi III", w: 20, h: 20, d: 3.8, frame: false, mount: "Olio su tela a spessore, concepita per l'esposizione senza cornice.", avail: false,
+      tech: "Olio su tela, 20 × 20 × 3.8 cm",
+      desc: ["In questa terza tela, la ricerca si sposta sulla massima preziosità materica. Il profilo del felino è interamente risolto nei toni di un nero profondo e denso, che assorbe la luce per restituirla unicamente lungo i vettori geometrici delle fenditure dorate. Il soggetto si staglia contro una campitura metallica che ne definisce la silhouette con assoluta precisione grafica. Un'opera solenne, giocata su riflessi cangianti e su un'estetica dal forte sapore architettonico."] },
+    { s: "Trame", t: "Trama IV", w: 40, h: 40, d: 2, frame: false, mount: "L'opera è concepita come parte integrante di un polittico a griglia e viene presentata all'interno della serie completa dei quattro elementi.", avail: true,
+      tech: "Olio su tela, 40 × 40 cm",
+      desc: ["L'opera conclude la scansione della serie attraverso una composizione frontale dall'impatto visivo netto e assoluto. Il colore della trama si fa qui ocra caldo e vibrante, agendo come una temperatura cromatica satura che isola il pensiero. Il volto riceve una luminosità diffusa e zenitale, esasperando il corto circuito sensoriale tra la naturalezza dell'incarnato e l'artificiosità traforata della barriera tessile. Lo sguardo ieratico stabilisce l'ultimo contatto diretto con lo spettatore, sigillando la griglia come mappa ordinata di diverse sfumature di isolamento e bellezza."] },
+    { s: "Gatti Pop", t: "Gatto Pop IV", w: 20, h: 20, d: 3.8, frame: false, mount: "Olio su tela a spessore, concepita per l'esposizione senza cornice.", avail: true,
+      tech: "Olio su tela, 20 × 20 × 3.8 cm",
+      desc: ["Uno studio classico ricalibrato su canoni contemporanei. La composizione si focalizza sul valore plastico del bianco puro, utilizzato per modellare il corpo del felino attraverso passaggi millimetrici di grigi intermedi e bianchi caldi. La figura si distacca con nitidezza da uno sfondo blu notte profondo e saturo, che ne esalta la purezza delle linee e il contorno grafico.", "L'inserto dorato sul muso crea un punto focale che dialoga con la radiosità dello sguardo, completando una tela dal rigore compositivo impeccabile."] },
+    { s: "Trame del silenzio", t: "Libertà", w: 60, h: 75, d: 2, frame: false, mount: "L'opera è completata da una cornice artigianale in legno con montaggio floating, concepita per valorizzare la tela.", avail: true,
+      tech: "Olio su tela, 60 × 75 cm",
+      desc: ["Il compimento del percorso sensoriale segna il passaggio definitivo dalla sottomissione alla sovranità. Lo sguardo finalmente si solleva e le mani stringono i fili dell'intreccio, governandone la direzione e l'intensità. La figura cessa di essere confinata dal limite e ne assume il controllo, convertendo il vincolo scarlatto nello strumento del proprio potere interiore; chi ha attraversato il silenzio dei sensi è ora il regista cosciente della propria architettura spirituale."] },
+    { s: "Gatti Kintsugi", t: "Gatto Kintsugi IV", w: 20, h: 20, d: 3.8, frame: false, mount: "Olio su tela a spessore, concepita per l'esposizione senza cornice.", avail: true,
+      tech: "Olio su tela, 20 × 20 × 3.8 cm",
+      desc: ["La serie si conclude con la massima esasperazione del contrasto complementare. Marco Magnani veste il felino di un blu oltremare intenso e vibrante, solcato da trame dorate che ne illuminano i lineamenti del muso e la linea del petto. Lo sfondo arancione saturo, di grande impatto visivo, converte l'opera in un magnetico elemento di design dello spazio, capace di dialogare con le architetture moderne attraverso la forza del colore puro."] }
   ];
   // foto di ogni opera, ritagliata sulla tela: opere/<titolo>.jpg
   const fileSlug = t => t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -842,9 +857,10 @@
     artBox.setAttribute("role", "img"); artBox.setAttribute("aria-label", w.t);
     document.getElementById("sheetSeries").textContent = w.s;
     document.getElementById("sheetTitle").textContent = `${w.t}, 2026`;
-    document.getElementById("sheetSize").textContent = w.d > 3 ? `${w.w} × ${w.h} × ${w.d} cm` : `${w.w} × ${w.h} cm`;
+    document.getElementById("sheetSize").textContent = w.tech;
     document.getElementById("sheetMount").textContent = w.mount;
-    document.getElementById("sheetDesc").textContent = w.desc;
+    document.getElementById("sheetMount").hidden = !w.mount;
+    document.getElementById("sheetDesc").replaceChildren(...w.desc.map(t => { const p = document.createElement("p"); p.textContent = t; return p; }));
     const ratio = w.w / w.h;
     artBox.style.aspectRatio = `${w.w} / ${w.h}`;
     const maxH = innerWidth / innerHeight < 1 || innerWidth <= 760 ? "42vh" : "62vh";
@@ -1153,10 +1169,12 @@
       if (all) info.append(el("p", "lv-kicker", w.s));
       info.append(
         el("h3", null, `${w.t}, 2026`),
-        el("p", null, w.d > 3 ? `${w.w} × ${w.h} × ${w.d} cm` : `${w.w} × ${w.h} cm`),
-        el("p", null, "Olio su tela"),
-        el("p", "lv-desc", w.desc)
+        el("p", null, w.tech)
       );
+      const desc = el("div", "lv-desc");
+      desc.append(...w.desc.map(t => el("p", null, t)));
+      info.append(desc);
+      if (w.mount) info.append(el("p", "lv-mount", w.mount));
       if (w.avail) {
         const a = el("a", "lv-cta", "Richiedi informazioni");
         a.href = `https://wa.me/${WA}?text=${encodeURIComponent(`Buongiorno, vorrei informazioni sull'opera "${w.t}" (${w.s}).`)}`;
