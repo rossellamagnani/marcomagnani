@@ -807,16 +807,19 @@
     walk(e.deltaY * unit * 0.006);
   }, { passive: false });
 
-  let touchY = null;
+  // col dito si cammina sia scorrendo in su/giù sia di lato: verso sinistra si avanza, verso destra si torna indietro
+  let touchY = null, touchX = 0;
   let touchT = 0, touchV = 0;
-  canvas.addEventListener("touchstart", e => { touchY = e.touches[0].clientY; touchT = performance.now(); touchV = 0; }, { passive: true });
+  canvas.addEventListener("touchstart", e => { touchY = e.touches[0].clientY; touchX = e.touches[0].clientX; touchT = performance.now(); touchV = 0; }, { passive: true });
   canvas.addEventListener("touchmove", e => {
     if (touchY == null) return;
-    const y = e.touches[0].clientY;
-    const d = (touchY - y) * 0.019, now = performance.now(), ddt = Math.max(8, now - touchT);
+    const y = e.touches[0].clientY, x = e.touches[0].clientX;
+    const dy = touchY - y, dx = touchX - x;
+    // conta il movimento prevalente, così un gesto un po' storto non va avanti e indietro insieme
+    const d = (Math.abs(dx) > Math.abs(dy) ? dx : dy) * 0.019, now = performance.now(), ddt = Math.max(8, now - touchT);
     walk(d);
     touchV = touchV * 0.6 + (d / ddt) * 1000 * 0.4; // velocità del dito (m/s), smussata
-    touchY = y; touchT = now;
+    touchY = y; touchX = x; touchT = now;
   }, { passive: true });
   // lasciando il dito il passo prosegue un poco per inerzia, come in una lista che scorre
   canvas.addEventListener("touchend", () => {
