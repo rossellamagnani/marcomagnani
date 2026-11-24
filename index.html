@@ -130,7 +130,7 @@
   .view-switch button[aria-pressed="true"] { color: var(--ink); }
   .view-switch button[aria-pressed="true"]::after { transform: scaleX(1); }
   .view-switch button:hover { color: var(--ink); }
-  body:has(.sheet.open) .view-switch, body:has(.menu-open) .view-switch { opacity: 0; pointer-events: none; }
+  body:has(.sheet.open) .view-switch, body:has(.menu-open) .view-switch, body.no-switch .view-switch { opacity: 0; pointer-events: none; }
 
   /* Vista a lista: dipinto a sinistra, testo a destra, linee sottili */
   .list-view {
@@ -142,6 +142,10 @@
     transition: opacity .4s ease, visibility 0s linear .4s;
   }
   .list-view:focus { outline: none; }
+  /* colonna: nelle pagine corte il footer scende comunque in fondo allo schermo */
+  .list-view { display: flex; flex-direction: column; }
+  .list-view > * { flex-shrink: 0; }
+  .list-view > .foot-fill { flex: 1 0 0px; }
   .list-view.open { opacity: 1; visibility: visible; transition: opacity .45s ease; }
   .lv-series {
     display: flex; align-items: center; justify-content: space-between; gap: 16px;
@@ -177,11 +181,50 @@
   .lv-info .lv-rest[hidden] { display: none; }
   .lv-info .lv-more { margin: 0 0 0.8em; padding: 0; border: 0; background: none; font: inherit; font-size: 0.85rem; color: var(--ink); cursor: pointer; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
   .lv-info .lv-more:hover { text-decoration-thickness: 2px; }
+  /* quando il testo intero ci sta nello spazio (vedi fitDescs) si mostra tutto, senza "Leggi tutto" */
+  .lv-desc.fits span.lv-rest[hidden] { display: inline; }
+  .lv-desc.fits p.lv-rest[hidden] { display: block; }
+  .lv-desc.fits .lv-more { display: none; }
+  .lv-info .lv-poly { margin-top: 10px; padding-top: 16px; border-top: 1px solid rgba(29,28,26,.18); max-width: 56ch; }
+  .lv-info .lv-poly p { font-size: 0.85rem; line-height: 1.55; color: var(--ink-soft); margin: 0 0 12px; }
+  .lv-thumbs { display: flex; gap: 10px; flex-wrap: wrap; }
+  .lv-thumbs button { width: 64px; height: 64px; padding: 0; border: 0; cursor: pointer; background: #8f8f8f center / cover no-repeat; box-shadow: 0 1px 2px rgba(0,0,0,.18); transition: transform .2s ease, box-shadow .2s ease; }
+  .lv-thumbs button:hover, .lv-thumbs button:focus-visible { transform: translateY(-2px); box-shadow: 0 6px 14px -6px rgba(0,0,0,.45); }
+  .lv-thumbs button:focus-visible { outline: 1px solid var(--ink); outline-offset: 3px; }
   .lv-info .lv-mount { margin-top: 2px; font-size: 0.85rem; line-height: 1.55; color: var(--ink-soft); max-width: 56ch; }
   .lv-info .lv-cta { margin-top: 12px; align-self: flex-start; color: var(--ink); font-size: 0.85rem; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
   .lv-info .lv-cta:hover { text-decoration-thickness: 2px; }
   .lv-info .lv-sold { margin-top: 12px; font-size: 0.85rem; color: var(--ink-soft); }
+  .lv-info .lv-mount.mount-gap { margin-top: 14px; }
+  .lv-info .lv-note { margin-top: 4px; font-size: 0.85rem; color: var(--ink-soft); }
+  .lv-info .lv-note[hidden] { display: none; }
+  #sheetActions { margin-top: 12px; }
+  /* disponibilità: pallino verde = disponibile, rosso = già venduta */
+  .lv-info .lv-cta:not(.no-dot)::before, .lv-info .lv-sold::before {
+    content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    margin-right: 9px; vertical-align: 1px; background: #3f9a5c;
+  }
+  .lv-info .lv-sold::before { background: #c4442f; }
   .lv-foot { height: 96px; }
+  body.no-switch .site-foot + .lv-foot { height: 0; }
+  .site-foot {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 24px;
+    margin-top: clamp(40px, 8vh, 80px); border-top: 1px solid var(--ink);
+    padding: 18px max(28px, env(safe-area-inset-right, 0px)) 22px max(28px, env(safe-area-inset-left, 0px));
+    font-size: 0.75rem; line-height: 1.7; color: var(--ink-soft);
+  }
+  .site-foot p { margin: 0; }
+  /* dopo l'ultima opera la riga del footer chiude il riquadro grigio */
+  .lv-row + .foot-fill + .site-foot { margin-top: 0; }
+  .soc { white-space: nowrap; }
+  .soc svg { display: inline-block; width: 1.05em; height: 1.05em; vertical-align: -0.17em; margin-right: 0.4em; }
+  .site-foot a { color: inherit; text-decoration: none; transition: color .2s; }
+  .site-foot a:hover, .site-foot a:focus-visible { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+  .site-foot .sep, .ct-value .sep { color: rgba(29,28,26,.3); }
+  .ab-text.pp h3 { margin: 2em 0 0.5em; font-size: 0.98rem; font-weight: 500; }
+  .ab-text.pp ul { margin: 0 0 1.2em; padding-left: 1.2em; }
+  .ab-text.pp li { font-size: 0.98rem; line-height: 1.75; color: #2c2c2a; margin-bottom: 0.3em; }
+  .ab-text.pp strong { font-weight: 500; }
   .lv-year {
     display: flex; align-items: center; justify-content: space-between; gap: 16px;
     padding: 18px max(28px, env(safe-area-inset-right, 0px)) 18px max(28px, env(safe-area-inset-left, 0px));
@@ -235,6 +278,33 @@
   .sheet .info { opacity: 0; transform: translateY(10px); transition: opacity .25s ease, transform .25s ease; }
   .sheet.open .info { opacity: 1; transform: none; transition: opacity .55s ease .18s, transform .75s cubic-bezier(.22,.8,.25,1) .18s; }
   .art-box.parked { visibility: hidden; }
+  /* opere con cornice: all'apertura si vede il dipinto come in galleria, poi la foto con la cornice lo sostituisce in dissolvenza */
+  .art-box { position: relative; }
+  .art-box .unframed { position: absolute; background: #8f8f8f center / cover no-repeat; pointer-events: none; }
+  .sheet.open .art-box .unframed { opacity: 0; transition: opacity .7s ease .5s; }
+  /* due foto per le tele a spessore: davanti e di profilo */
+  .has-slides { position: relative; }
+  .has-slides.side-on { box-shadow: none; background: transparent !important; }
+  .framed-pic { background-color: transparent !important; background-size: contain !important; box-shadow: none !important; filter: drop-shadow(0 1px 1px rgba(0,0,0,.2)) drop-shadow(0 10px 12px rgba(0,0,0,.2)); }
+  .slides { position: absolute; inset: 0; overflow: hidden; }
+  .slides-track { display: flex; height: 100%; transition: transform .5s cubic-bezier(.22,.8,.25,1); }
+  .slides-track > div { flex: 0 0 100%; height: 100%; }
+  .slide-btn { position: absolute; top: 50%; z-index: 2; width: 36px; height: 36px; margin-top: -18px; padding: 0; border: 1px solid rgba(29,28,26,.2); border-radius: 50%; background: rgba(255,255,255,.9); color: var(--ink); display: grid; place-items: center; cursor: pointer; transition: opacity .2s ease, background .2s ease; }
+  .slide-btn:hover { background: #fff; }
+  .slide-btn:focus-visible { outline: 1px solid var(--ink); outline-offset: 2px; }
+  .slide-btn svg { width: 14px; height: 14px; }
+  /* frecce fuori dal quadro, appena accanto al bordo */
+  .slide-btn.prev { left: -50px; } .slide-btn.next { right: -50px; }
+  @media (max-width: 760px), (max-aspect-ratio: 1/1) {
+    /* telefono: frecce sempre ai lati del quadro, appena fuori dal bordo; il quadro si stringe per far loro posto */
+    .slide-btn { width: 32px; height: 32px; margin-top: -16px; }
+    .slide-btn.prev { left: -40px; } .slide-btn.next { right: -40px; }
+    .lv-art:has(.has-slides), .sheet .lv-art:has(.has-slides) { padding-left: 48px; padding-right: 48px; padding-bottom: 52px; }
+  }
+  .slide-btn[disabled] { opacity: 0; pointer-events: none; }
+  .slide-dots { position: absolute; left: 0; right: 0; bottom: -22px; display: flex; justify-content: center; gap: 7px; }
+  .slide-dots i { width: 5px; height: 5px; border-radius: 50%; background: rgba(29,28,26,.22); transition: background .2s ease; }
+  .slide-dots i.on { background: var(--ink); }
   .flyer {
     position: fixed; z-index: 22; margin: 0;
     background: var(--placeholder);
@@ -272,7 +342,7 @@
 
   /* schermi stretti o verticali: opera in alto, scheda sotto */
   @media (max-width: 760px), (max-aspect-ratio: 1/1) {
-    .sheet .lv-art { min-height: 0; padding: 40px 24px; position: static; }
+    .sheet .lv-art { min-height: 0; padding: 60px 24px 40px; position: static; }
     .sheet .lv-info { padding-top: 32px; }
     .caption .title { font-size: 1rem; }
     :root { --art-vh: 42vh; }
@@ -332,8 +402,7 @@
     .hint, .caption { bottom: calc(env(safe-area-inset-bottom, 0px) + 84px); }
     .lv-foot { height: 110px; }
     /* con la scheda aperta la X prende il posto del pulsante menu */
-    body:has(.sheet.open) .menu-btn { visibility: hidden; }
-    .close { top: calc(env(safe-area-inset-top, 0px) + 8px); right: max(8px, env(safe-area-inset-right, 0px)); z-index: 31; }
+    .close { right: max(8px, env(safe-area-inset-right, 0px)); }
   }
   @media (max-width: 640px) {
     .hint, .caption { bottom: calc(env(safe-area-inset-bottom, 0px) + 84px); }
@@ -383,9 +452,11 @@
       <p class="lv-kicker" id="sheetSeries"></p>
       <h2 id="sheetTitle"></h2>
       <p id="sheetSize"></p>
+      <p class="lv-note" id="sheetNote"></p>
+      <div id="sheetActions"></div>
       <div class="lv-desc" id="sheetDesc"></div>
       <p class="lv-mount" id="sheetMount"></p>
-      <div id="sheetActions"></div>
+      <div id="sheetPoly"></div>
     </div>
   </div>
 </div>
@@ -404,22 +475,22 @@
     { s: "Gatti Pop", t: "Gatto Pop I", w: 20, h: 20, d: 3.8, frame: false, mount: "Olio su tela a spessore, concepita per l'esposizione senza cornice.", avail: true,
       tech: "Olio su tela, 20 × 20 × 3.8 cm",
       desc: ["L'opera si struttura su un accordo cromatico quasi monocromatico, in cui la silhouette del felino emerge da un fondo coordinato della medesima tonalità azzurra. Marco Magnani annulla il contrasto tonale di sfondo per concentrarsi unicamente sulle variazioni chiaroscurali che scolpiscono il volume e la muscolatura del soggetto.", "L'inserto dorato sul muso e la luminosità controllata dello sguardo fungono da uniche coordinate di rottura visiva, definendo un'opera di assoluta freschezza e rigore geometrico."] },
-    { s: "Trame del silenzio", t: "Vista", w: 40, h: 40, d: 2, frame: false, mount: "L'opera è completata da una cornice artigianale in legno con montaggio floating, concepita per valorizzare la tela.", avail: true,
+    { s: "Trame del silenzio", t: "Vista", w: 40, h: 40, d: 2, frame: false, ar: 1400/1382, note: "Presentata con cornice artigianale \"floating\".", mount: "L'opera è completata da una cornice artigianale in legno con montaggio floating, concepita per valorizzare la tela.", avail: true,
       tech: "Olio su tela, 40 × 40 cm",
       desc: ["L’oscuramento dello sguardo diventa la condizione necessaria per accedere alla visione interiore. In questo capitolo della serie, la complessità geometrica del ricamo vermiglio cinge gli occhi della figura, interrompendo la dinamica del giudizio e della pura osservazione quotidiana. Questo ostacolo visivo si trasmuta in un invito a guardare verso l’interno, in un luogo sospeso dove l'assenza di stimoli ed immagini esterne libera la reale densità del pensiero."] },
     { s: "Gatti Kintsugi", t: "Gatto Kintsugi I", w: 20, h: 20, d: 3.8, frame: false, mount: "Olio su tela a spessore, concepita per l'esposizione senza cornice.", avail: true,
       tech: "Olio su tela, 20 × 20 × 3.8 cm",
       desc: ["L'opera apre il ciclo impostando una forte tensione cromatica. Il corpo del felino è risolto attraverso una stesura rosso scuro, profonda e materica, su cui si innesta la ramificazione dorata. Le fratture ridisegnano la muscolatura del soggetto, che emerge per netto contrasto volumetrico da un fondo turchese saturo e assoluto. Il dialogo tra toni caldi e freddi azzera la componente aneddotica, focalizzando l'attenzione sul rigore della linea."] },
-    { s: "Pietre", t: "Pietra viva", w: 80, h: 120, d: 2, frame: false, mount: "", avail: true,
+    { s: "Pietre", t: "Pietra viva", w: 80, h: 120, d: 2, frame: false, ar: 963/1400, mount: "", note: "Presentata con cornice artigianale \"floating\".", avail: true,
       tech: "Olio su tela, 80 × 120 cm",
-      desc: ["Attraverso uno studio profondo ispirato alla maestria scultorea di Coderch & Malavia, l’immobilità della posa si trasforma in una tensione vibrante che sfida il tempo. Partendo dal rigore della forma plastica, l’artista cerca di scioglierne la rigidità: il corpo resta raccolto, quasi trattenuto, ma il colore lo attraversa e lo divide, rendendolo instabile.", "In questo equilibrio fragile, il confine tra roccia e pelle svanisce: non è più solo pietra, ma non è ancora completamente carne. Una fusione magnetica tra la solidità della materia e la delicatezza del figurativo che domina lo spazio con grazia e presenza scenica. Presentata con cornice artigianale \"floating\"."] },
+      desc: ["Attraverso uno studio profondo ispirato alla maestria scultorea di Coderch & Malavia, l’immobilità della posa si trasforma in una tensione vibrante che sfida il tempo. Partendo dal rigore della forma plastica, l’artista cerca di scioglierne la rigidità: il corpo resta raccolto, quasi trattenuto, ma il colore lo attraversa e lo divide, rendendolo instabile.", "In questo equilibrio fragile, il confine tra roccia e pelle svanisce: non è più solo pietra, ma non è ancora completamente carne. Una fusione magnetica tra la solidità della materia e la delicatezza del figurativo che domina lo spazio con grazia e presenza scenica."] },
     { s: "Trame", t: "Trama II", w: 40, h: 40, d: 2, frame: false, mount: "L'opera è concepita come parte integrante di un polittico a griglia e viene presentata all'interno della serie completa dei quattro elementi.", avail: true,
       tech: "Olio su tela, 40 × 40 cm",
       desc: ["Nel secondo passaggio del polittico, la figura abbandona la rigidità verticale per raccogliersi lungo la diagonale definita dal gesto intimo della mano, che sostiene il volto in un momento di assoluta stasi. La trama si appropria qui di un blu intenso e profondo, trasformando la fibra in un conduttore di stati d'animo ipnotici. Il rilievo e il nodo del pizzo, premuti contro la pelle, attutiscono il rumore del mondo esterno e invitano l'osservatore a \"toccare con lo sguardo\" una superficie posta a protezione dell'intimità del soggetto."] },
     { s: "Gatti Pop", t: "Gatto Pop II", w: 20, h: 20, d: 3.8, frame: false, mount: "Olio su tela a spessore, concepita per l'esposizione senza cornice.", avail: true,
       tech: "Olio su tela, 20 × 20 × 3.8 cm",
       desc: ["Un impianto visivo di forte impatto volumetrico e netto contrasto. In questa tavola, il manto del felino è risolto attraverso una stesura fucsia vibrante e satura, che si staglia con assoluta precisione contro l'oscurità profonda di un fondo nero opaco. La scelta di azzerare la luminosità retrostante monumentalizza la silhouette, trasformando il ritratto in un punto di pura energia cromatica.", "Il dettaglio geometrico della foglia d'oro sul naso sigilla la composizione conferendole una solennità geometrica."] },
-    { s: "Trame del silenzio", t: "Ascolto", w: 40, h: 40, d: 2, frame: false, mount: "L'opera è completata da una cornice artigianale in legno con montaggio floating, concepita per valorizzare la tela.", avail: true,
+    { s: "Trame del silenzio", t: "Ascolto", w: 40, h: 40, d: 2, frame: false, ar: 1, note: "Presentata con cornice artigianale \"floating\".", mount: "L'opera è completata da una cornice artigianale in legno con montaggio floating, concepita per valorizzare la tela.", avail: true,
       tech: "Olio su tela, 40 × 40 cm",
       desc: ["La purificazione dell'ascolto si compie attraverso la ricerca del silenzio assoluto. La fibra materica avvolge i padiglioni auricolari, isolando la fisionomia dalle interferenze e dalle distrazioni del reale. Non si tratta di una privazione subìta, ma di una scelta catartica: zittire la frequenza del contingente per sintonizzare la coscienza su un’eco più profonda, intima e monumentale."] },
     { s: "Gatti Kintsugi", t: "Gatto Kintsugi II", w: 20, h: 20, d: 3.8, frame: false, mount: "Olio su tela a spessore, concepita per l'esposizione senza cornice.", avail: false,
@@ -431,7 +502,7 @@
     { s: "Gatti Pop", t: "Gatto Pop III", w: 20, h: 20, d: 3.8, frame: false, mount: "Olio su tela a spessore, concepita per l'esposizione senza cornice.", avail: true,
       tech: "Olio su tela, 20 × 20 × 3.8 cm",
       desc: ["L'opera indaga il dialogo tra la profondità del blu cobalto e la preziosità metallica dello sfondo. Marco Magnani isola il profilo del gatto immettendolo all'interno di una campitura in oro che rifrange la luce circostante in modo cangiante, modificando la percezione dell'opera a seconda dell'angolo di osservazione.", "La densità del pigmento blu del manto agisce in perfetta contrapposizione complementare con la texture metallica dello sfondo, risolvendo il dipinto in una sintesi di grande spessore materico."] },
-    { s: "Trame del silenzio", t: "Parola", w: 40, h: 40, d: 2, frame: false, mount: "L'opera è completata da una cornice artigianale in legno con montaggio floating, concepita per valorizzare la tela.", avail: true,
+    { s: "Trame del silenzio", t: "Parola", w: 40, h: 40, d: 2, frame: false, ar: 1400/1386, note: "Presentata con cornice artigianale \"floating\".", mount: "L'opera è completata da una cornice artigianale in legno con montaggio floating, concepita per valorizzare la tela.", avail: true,
       tech: "Olio su tela, 40 × 40 cm",
       desc: ["Il sigillo della parola restituisce al volto la sacralità della stasi. Le labbra vengono racchiuse e protette dal manufatto rosso, congelando l'atto della comunicazione verbale e del consumo. L'interruzione del discorso costringe la figura a rinunciare a qualsiasi aneddoto o espressione superficiale, trasformando l'immobilità della bocca in un presidio di pura resistenza spirituale."] },
     { s: "Gatti Kintsugi", t: "Gatto Kintsugi III", w: 20, h: 20, d: 3.8, frame: false, mount: "Olio su tela a spessore, concepita per l'esposizione senza cornice.", avail: false,
@@ -443,7 +514,7 @@
     { s: "Gatti Pop", t: "Gatto Pop IV", w: 20, h: 20, d: 3.8, frame: false, mount: "Olio su tela a spessore, concepita per l'esposizione senza cornice.", avail: true,
       tech: "Olio su tela, 20 × 20 × 3.8 cm",
       desc: ["Uno studio classico ricalibrato su canoni contemporanei. La composizione si focalizza sul valore plastico del bianco puro, utilizzato per modellare il corpo del felino attraverso passaggi millimetrici di grigi intermedi e bianchi caldi. La figura si distacca con nitidezza da uno sfondo blu notte profondo e saturo, che ne esalta la purezza delle linee e il contorno grafico.", "L'inserto dorato sul muso crea un punto focale che dialoga con la radiosità dello sguardo, completando una tela dal rigore compositivo impeccabile."] },
-    { s: "Trame del silenzio", t: "Libertà", w: 60, h: 75, d: 2, frame: false, mount: "L'opera è completata da una cornice artigianale in legno con montaggio floating, concepita per valorizzare la tela.", avail: true,
+    { s: "Trame del silenzio", t: "Libertà", w: 60, h: 75, d: 2, frame: false, ar: 1095/1400, note: "Presentata con cornice artigianale \"floating\".", mount: "L'opera è completata da una cornice artigianale in legno con montaggio floating, concepita per valorizzare la tela.", avail: true,
       tech: "Olio su tela, 60 × 75 cm",
       desc: ["Il compimento del percorso sensoriale segna il passaggio definitivo dalla sottomissione alla sovranità. Lo sguardo finalmente si solleva e le mani stringono i fili dell'intreccio, governandone la direzione e l'intensità. La figura cessa di essere confinata dal limite e ne assume il controllo, convertendo il vincolo scarlatto nello strumento del proprio potere interiore; chi ha attraversato il silenzio dei sensi è ora il regista cosciente della propria architettura spirituale."] },
     { s: "Gatti Kintsugi", t: "Gatto Kintsugi IV", w: 20, h: 20, d: 3.8, frame: false, mount: "Olio su tela a spessore, concepita per l'esposizione senza cornice.", avail: true,
@@ -452,7 +523,8 @@
   ];
   // foto di ogni opera, ritagliata sulla tela: opere/<titolo>.jpg
   const fileSlug = t => t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-  works.forEach(w => { w.img = "opere/" + fileSlug(w.t) + ".jpg"; });
+  // ar = proporzioni della foto con la cornice floating: in galleria resta la tela, nelle immagini si vede la cornice
+  works.forEach(w => { w.img = "opere/" + fileSlug(w.t) + ".jpg"; w.pic = w.ar ? "opere/" + fileSlug(w.t) + "-cornice.webp" : w.img; if (w.d > 3) w.side = "opere/" + fileSlug(w.t) + "-lato.jpg"; });
   const PHONE = "+39 348 4109 585";
   const WA = "393484109585";
 
@@ -460,9 +532,9 @@
   // L'anello si percorre in senso orario: curva sempre a sinistra e non finisce mai.
   const OPTIONS = {
     // Schermi orizzontali: opere solo sulla parete esterna (destra), che in curva viene incontro a chi cammina.
-    galleria: { R: 14, W: 4.6, H: 4.0, sides: "right", camShift: -0.5, spacing: 2.6, tilt: 0, lookIn: -0.05, guided: false, scale: 2.3 },
+    galleria: { R: 14, W: 4.6, H: 4.0, sides: "right", camShift: -0.3, spacing: 2.6, tilt: 0, lookIn: -0.02, guided: false, scale: 2.3 },
     // Schermi verticali (telefono, iPad in verticale): opere solo sulla parete esterna, camminando vicino a quella interna.
-    verticale: { R: 12, W: 3.8, H: 3.8, sides: "right", camShift: -0.4, spacing: 2.6, tilt: 0, lookIn: -0.06, guided: false, scale: 2.55 }
+    verticale: { R: 12, W: 3.8, H: 3.8, sides: "right", camShift: -0.25, spacing: 2.6, tilt: 0, lookIn: -0.04, guided: false, scale: 2.55 }
   };
   const EYE = 1.6;
   const SCALE = 2.0; // ingrandimento delle opere per leggibilità
@@ -540,9 +612,24 @@
     } catch (e) { return new THREE.Color(0x444444); }
   }
 
+  // colore di sfondo del dipinto: la mediana dei pixel lungo il bordo alto e la metà alta dei lati
+  function backgroundColor(img) {
+    try {
+      const N = 64, c = document.createElement("canvas"); c.width = c.height = N;
+      const x = c.getContext("2d"); x.drawImage(img, 0, 0, N, N);
+      const d = x.getImageData(0, 0, N, N).data, px = [];
+      const take = (i, j) => { const k = (j * N + i) * 4; px.push([d[k], d[k + 1], d[k + 2]]); };
+      for (let j = 0; j < 4; j++) for (let i = 0; i < N; i++) take(i, j);
+      for (let j = 4; j < N / 2; j++) for (let i = 0; i < 3; i++) { take(i, j); take(N - 1 - i, j); }
+      const med = ch => { const v = px.map(p => p[ch]).sort((a, b) => a - b); return v[v.length >> 1] / 255; };
+      return new THREE.Color(med(0), med(1), med(2));
+    } catch (e) { return null; }
+  }
+
   // ---------- Costruzione ----------
   const greys = [0x9a9a9a, 0x8d8d8d, 0xa6a6a6, 0x858585];
   const pickables = [];
+  let innerWall = null;
   const frames = [];
   const SEG = 400;
 
@@ -568,6 +655,7 @@
     [R_IN, R_OUT].forEach(r => {
       const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, H, SEG, 1, true), wallMat);
       m.position.y = H / 2; world.add(m);
+      if (r === R_IN) innerWall = m; // copre i quadri dietro la curva: serve per non cliccarli attraverso il muro
     });
     ringFlat(R_IN, R_OUT, 0, 0xdedede, true);
     const ceil = new THREE.Mesh(new THREE.RingGeometry(R_IN, R_OUT, SEG, 1), new THREE.MeshBasicMaterial({ color: 0xf1f1f1, side: THREE.DoubleSide }));
@@ -641,6 +729,11 @@
         mat.needsUpdate = true;
         const avg = averageColor(tex.image);
         [[sideM, 0.86], [topM, 1.1], [botM, 0.62]].forEach(([m, k]) => m.color.copy(avg).multiplyScalar(k));
+        // tele a spessore (i gatti): il bordo è dipinto in tinta piena con il colore dello sfondo, come nelle foto di profilo
+        if (work.side) {
+          const bg = backgroundColor(tex.image);
+          if (bg) [[sideM, 0.86], [topM, 1.04], [botM, 0.62]].forEach(([m, k]) => m.color.copy(bg).multiplyScalar(k));
+        }
       });
       if (work.frame) {
         const fd = 0.06;
@@ -747,12 +840,34 @@
   const ndc = new THREE.Vector2();
   let down = null;
 
+  // tutte le opere visibili sono cliccabili, anche quelle lontane; per quelle piccole c'è un margine attorno
+  const PICK_PAD = 14;
   function pick(clientX, clientY) {
     ndc.set((clientX / innerWidth) * 2 - 1, -(clientY / innerHeight) * 2 + 1);
     ray.setFromCamera(ndc, camera);
-    const hit = ray.intersectObjects(pickables, false)[0];
-    if (!hit || hit.distance > 12) return null;
-    return hit.object;
+    const hits = ray.intersectObjects(innerWall ? [...pickables, innerWall] : pickables, false);
+    if (hits[0] && hits[0].object !== innerWall) return hits[0].object;
+    // nessun colpo diretto: il quadro visibile più vicino al punto, entro il margine
+    let best = null, bestD = Infinity;
+    const v = new THREE.Vector3(), dir = new THREE.Vector3();
+    for (const g of frames) {
+      const m = g.userData.canvasMesh;
+      m.getWorldPosition(v);
+      if (v.clone().project(camera).z > 1) continue; // dietro la camera
+      const r = paintingRect(g);
+      const dx = Math.max(r.left - clientX, 0, clientX - (r.left + r.width));
+      const dy = Math.max(r.top - clientY, 0, clientY - (r.top + r.height));
+      const d = Math.hypot(dx, dy);
+      if (d > PICK_PAD || d >= bestD) continue;
+      // il quadro deve essere davvero in vista (non nascosto dalla parete interna)
+      dir.copy(v).sub(camera.position);
+      const dist = dir.length();
+      ray.set(camera.position, dir.normalize());
+      const wallHit = innerWall && ray.intersectObject(innerWall, false)[0];
+      if (wallHit && wallHit.distance < dist) continue;
+      best = m; bestD = d;
+    }
+    return best;
   }
 
   canvas.addEventListener("pointermove", e => {
@@ -795,11 +910,24 @@
     return { left, top, width: Math.max(...xs) - left, height: Math.max(...ys) - top };
   }
 
+  // Foto con cornice: il dipinto vero occupa solo l'interno del riquadro, il quadro 3D deve finire lì
+  let sheetWork = null;
+  function targetRect() {
+    const r = artBox.getBoundingClientRect();
+    const w = sheetWork;
+    if (!w || !w.ar) return r;
+    const a = w.w / w.h, k = 0.955; // la cornice occupa circa il 2% per lato
+    let width = r.width, height = r.width / a;
+    if (height > r.height) { height = r.height; width = height * a; }
+    width *= k; height *= k;
+    return { left: r.left + (r.width - width) / 2, top: r.top + (r.height - height) / 2, width, height };
+  }
   // Sposta un elemento da un rettangolo all'altro con una sola trasformazione (fluida anche su telefono)
   function fly(from, to, duration) {
     const el = document.createElement("div");
     el.className = "flyer";
-    el.style.background = artBox.style.background;
+    // in volo si vede il dipinto senza cornice, come in galleria; la cornice compare dopo
+    el.style.background = sheetWork && sheetWork.ar ? `#8f8f8f url("${sheetWork.img}") center / cover no-repeat` : artBox.style.background;
     Object.assign(el.style, { left: to.left + "px", top: to.top + "px", width: to.width + "px", height: to.height + "px" });
     document.body.append(el);
     const start = `translate(${from.left - to.left}px, ${from.top - to.top}px) scale(${from.width / to.width}, ${from.height / to.height})`;
@@ -855,43 +983,131 @@
     out.q.copy(dummy.quaternion);
   }
 
-  // le prime frasi sempre visibili, il resto (anche dello stesso paragrafo) dietro "Leggi tutto"
-  function descParts(paras) {
-    const mk = t => { const p = document.createElement("p"); p.textContent = t; return p; };
-    const sent = paras[0].match(/[^.!?]+[.!?]+(?:\s+|$)/g) || [paras[0]];
-    let head = "", k = 0;
-    while (k < sent.length && (head.length < 150 || k === 0)) head += sent[k++];
-    const tail = sent.slice(k).join("");
-    if (!tail.trim() && paras.length === 1) return [mk(paras[0])];
-    const first = mk(head.trimEnd());
-    const more = document.createElement("span");
-    more.className = "lv-rest"; more.hidden = true; more.textContent = " " + tail.trim();
-    if (tail.trim()) first.append(more);
-    const rest = paras.slice(1).map(t => { const p = mk(t); p.className = "lv-rest"; p.hidden = true; return p; });
-    const btn = document.createElement("button");
-    btn.type = "button"; btn.className = "lv-more"; btn.textContent = "Leggi tutto";
-    btn.setAttribute("aria-expanded", "false");
-    btn.addEventListener("click", () => {
-      const open = btn.getAttribute("aria-expanded") !== "true";
-      more.hidden = !open; rest.forEach(p => { p.hidden = !open; });
-      btn.textContent = open ? "Riduci" : "Leggi tutto";
-      btn.setAttribute("aria-expanded", String(open));
-    });
-    return [first, ...rest, btn];
+  // le Trame sono un polittico: una riga che lo dice e un rimando alla collezione, dove sono una sotto l'altra
+  const POLY = "Trame";
+  // il polittico intero, con la sua cornice: si vende anche così
+  const POLYWORK = { s: POLY, t: "Trame, polittico", img: "opere/trame-polittico.jpg", w: 1, h: 1 };
+  // nella scheda: le Trame rimandano al polittico intero, le altre collezioni alle altre opere della serie
+  function polyNode(w) {
+    const kind = w.s === POLY ? "poly" : "serie";
+    const list = kind === "poly" ? [POLYWORK] : works.filter(x => x.s === w.s && x !== w);
+    if (!list.length) return null;
+    const box = document.createElement("div");
+    box.className = "lv-poly";
+    const p = document.createElement("p");
+    p.textContent = kind === "poly" ? w.mount : `Le altre opere di ${w.s}:`;
+    const row = document.createElement("div");
+    row.className = "lv-thumbs";
+    for (const o of list) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.style.backgroundImage = `url("${o.pic || o.img}")`;
+      if (o.ar) b.classList.add("framed-pic");
+      b.title = o === POLYWORK ? "Il polittico completo" : o.t; b.setAttribute("aria-label", `Vai a ${b.title}`);
+      b.addEventListener("click", () => sheetOpen ? sheetToSeries(w.s, o) : showSeries(w.s, false, o));
+      row.append(b);
+    }
+    box.append(p, row);
+    return box;
   }
 
+  // fronte e profilo: due foto che scorrono con le frecce (e con il dito)
+  function makeSlides(box, w, color) {
+    box.classList.remove("has-slides", "side-on");
+    box.replaceChildren();
+    box.resetSlides = null;
+    if (!w.side) { box.setAttribute("role", "img"); box.setAttribute("aria-label", w.t); return; }
+    box.setAttribute("role", "group"); box.setAttribute("aria-label", `${w.t}: foto di fronte e di profilo`);
+    box.classList.add("has-slides");
+    box.style.background = color;
+    const wrap = document.createElement("div"); wrap.className = "slides";
+    const track = document.createElement("div"); track.className = "slides-track";
+    const front = document.createElement("div"); front.style.background = `${color} url("${w.img}") center / cover no-repeat`;
+    const side = document.createElement("div"); side.style.background = `#f1f1f0 url("${w.side}") center / contain no-repeat`;
+    side.setAttribute("role", "img"); side.setAttribute("aria-label", `${w.t}, di profilo`);
+    track.append(front, side); wrap.append(track);
+    const arrow = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="${d}"/></svg>`;
+    const prev = document.createElement("button"); prev.type = "button"; prev.className = "slide-btn prev"; prev.innerHTML = arrow("M15 5l-7 7 7 7"); prev.setAttribute("aria-label", "Foto di fronte");
+    const next = document.createElement("button"); next.type = "button"; next.className = "slide-btn next"; next.innerHTML = arrow("M9 5l7 7-7 7"); next.setAttribute("aria-label", "Foto di profilo");
+    const dots = document.createElement("div"); dots.className = "slide-dots"; dots.append(document.createElement("i"), document.createElement("i"));
+    let at = 0;
+    const go = n => {
+      at = Math.max(0, Math.min(1, n));
+      track.style.transform = `translateX(${-100 * at}%)`;
+      box.classList.toggle("side-on", at === 1);
+      prev.disabled = at === 0; next.disabled = at === 1;
+      [...dots.children].forEach((d, k) => d.classList.toggle("on", k === at));
+    };
+    prev.addEventListener("click", e => { e.stopPropagation(); go(at - 1); });
+    next.addEventListener("click", e => { e.stopPropagation(); go(at + 1); });
+    let x0 = null;
+    wrap.addEventListener("pointerdown", e => { x0 = e.clientX; });
+    wrap.addEventListener("pointerup", e => { if (x0 !== null && Math.abs(e.clientX - x0) > 40) go(at + (e.clientX < x0 ? 1 : -1)); x0 = null; });
+    box.append(wrap, prev, next, dots);
+    box.resetSlides = () => { track.style.transition = "none"; go(0); track.offsetWidth; track.style.transition = ""; };
+    go(0);
+  }
+
+  // le prime frasi sempre visibili, il resto (anche dello stesso paragrafo) dietro "Leggi tutto"
+  // descrizione sempre intera, identica in scheda, collezioni, lista e archivio
+  function descParts(paras) {
+    return paras.map(t => { const p = document.createElement("p"); p.textContent = t; return p; });
+  }
+
+  // Testo intero quando ci sta, altrimenti le prime frasi con "Leggi tutto".
+  // Affiancato all'immagine: ci sta se tutta la colonna del testo entra in uno schermo.
+  // Sotto l'immagine (telefono): ci sta se la descrizione non supera circa 4/10 dello schermo.
+  function fitDescs(root) {
+    const avail = innerHeight - siteHeader.offsetHeight;
+    root.querySelectorAll(".lv-desc").forEach(d => {
+      const btn = d.querySelector(".lv-more");
+      if (!btn) return;
+      if (btn.getAttribute("aria-expanded") === "true") return; // aperto a mano: resta aperto
+      d.classList.add("fits");
+      const info = d.closest(".lv-info"), art = info && info.parentElement.querySelector(".lv-art");
+      let ok;
+      if (info && art && info.getBoundingClientRect().top < art.getBoundingClientRect().bottom - 1) {
+        const kids = [...info.children].filter(k => k.offsetParent !== null && k.id !== "sheetPoly"); // le miniature in fondo possono restare sotto
+        const cs = getComputedStyle(info);
+        const h = kids[kids.length - 1].getBoundingClientRect().bottom - kids[0].getBoundingClientRect().top
+          + parseFloat(cs.paddingTop) + 24;
+        ok = h <= avail;
+      } else ok = d.getBoundingClientRect().height <= innerHeight * 0.4;
+      d.classList.toggle("fits", ok);
+    });
+  }
+  let fitTimer = 0;
+  addEventListener("resize", () => { clearTimeout(fitTimer); fitTimer = setTimeout(() => { fitDescs(listView); fitDescs(sheet); }, 150); });
+
   function fillSheet(w, base) {
-    artBox.style.background = `#8f8f8f url("${w.img}") center / cover no-repeat`;
+    sheetWork = w;
+    artBox.style.background = `#8f8f8f url("${w.pic}") center / cover no-repeat`;
     artBox.textContent = "";
-    artBox.setAttribute("role", "img"); artBox.setAttribute("aria-label", w.t);
+    makeSlides(artBox, w, "#8f8f8f");
+    artBox.classList.toggle("framed-pic", !!w.ar); // foto scontornata con la cornice: niente fondo né ombra rettangolare
+    if (w.ar) {
+      // stesso riquadro interno usato per fermare la camera (targetRect), in percentuale del riquadro
+      const a = w.w / w.h, k = 0.955;
+      let fw = 1, fh = w.ar / a;
+      if (fh > 1) { fw = a / w.ar; fh = 1; }
+      const u = el("div", "unframed");
+      u.style.backgroundImage = `url("${w.img}")`;
+      Object.assign(u.style, { width: fw * k * 100 + "%", height: fh * k * 100 + "%", left: (1 - fw * k) * 50 + "%", top: (1 - fh * k) * 50 + "%" });
+      artBox.append(u);
+    }
     document.getElementById("sheetSeries").textContent = w.s;
     document.getElementById("sheetTitle").textContent = `${w.t}, 2026`;
     document.getElementById("sheetSize").textContent = w.tech;
     document.getElementById("sheetMount").textContent = w.mount;
-    document.getElementById("sheetMount").hidden = !w.mount;
+    document.getElementById("sheetNote").textContent = w.note || "";
+    document.getElementById("sheetNote").hidden = !w.note;
+    document.getElementById("sheetMount").hidden = !w.mount || w.s === POLY;
     document.getElementById("sheetDesc").replaceChildren(...descParts(w.desc));
-    const ratio = w.w / w.h;
-    artBox.style.aspectRatio = `${w.w} / ${w.h}`;
+    requestAnimationFrame(() => fitDescs(sheet));
+    const poly = polyNode(w);
+    document.getElementById("sheetPoly").replaceChildren(...(poly ? [poly] : []));
+    const ratio = w.ar || w.w / w.h;
+    artBox.style.aspectRatio = String(ratio);
     const maxH = innerWidth / innerHeight < 1 || innerWidth <= 760 ? "42vh" : "62vh";
     artBox.style.height = "auto";
     artBox.style.maxHeight = "none";
@@ -918,7 +1134,7 @@
     sheetOpen = true;
     activeGroup = g;
     sheet.scrollTop = 0;
-    const rect = artBox.getBoundingClientRect();
+    const rect = targetRect();
 
     // dove fermarsi lungo la curva: poco prima del quadro (se è già vicino, si resta dove si è)
     const C = 2 * Math.PI * R;
@@ -986,8 +1202,9 @@
     if (!sheetOpen || camAnim || !focus) return;
     const g = activeGroup;
     closeBtn.hidden = true;
+    if (artBox.resetSlides) artBox.resetSlides();
     if (mismatch && !reduceMotion && g) {
-      const rect = artBox.getBoundingClientRect();
+      const rect = targetRect();
       artBox.classList.add("parked");
       fly(rect, paintingRect(g), 420).then(el => { artBox.classList.remove("parked"); el.remove(); });
     }
@@ -1011,6 +1228,19 @@
       };
     }, 220);
   }
+  // dalla scheda direttamente a una collezione: la lista copre tutto, la camera torna in cammino sotto
+  function sheetToSeries(name, work) {
+    if (!sheetOpen || camAnim) return;
+    closeBtn.hidden = true;
+    artBox.classList.remove("parked");
+    const back = Math.min(pos, activeArc - BACK);
+    focus = null; activeGroup = null; sheetOpen = false; vel = 0; shownWork = -2;
+    pos = target = back;
+    walkPose(back, poseA);
+    camera.position.copy(poseA.pos); camera.quaternion.copy(poseA.q);
+    showSeries(name, false, work);
+    setTimeout(() => sheet.classList.remove("open"), 350);
+  }
   closeBtn.addEventListener("click", closeSheet);
   sheet.addEventListener("click", e => { if (e.target === sheet) closeSheet(); });
 
@@ -1019,7 +1249,8 @@
   const collBtn = document.getElementById("collBtn");
   const collBar = document.getElementById("collBar");
   let rowObserver = null, currentSeries = null, collOpen = false;
-  const seriesOrder = [];
+  // ordine delle collezioni nel menu e in "Tutte le opere"
+  const seriesOrder = ["Trame", "Trame del silenzio", "Pietre", "Gatti Kintsugi", "Gatti Pop"];
   works.forEach(w => { if (!seriesOrder.includes(w.s)) seriesOrder.push(w.s); });
   const slug = t => t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
@@ -1049,14 +1280,14 @@
   function markCurrent() {
     collBar.querySelectorAll("a").forEach(a => a.dataset.series === currentSeries ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
     for (const [name, pg] of Object.entries(PAGES)) {
-      const l = document.getElementById(pg.link);
-      currentSeries === name ? l.setAttribute("aria-current", "page") : l.removeAttribute("aria-current");
+      const l = pg.link && document.getElementById(pg.link);
+      if (l) currentSeries === name ? l.setAttribute("aria-current", "page") : l.removeAttribute("aria-current");
     }
   }
 
-  const ALL = "Tutte le opere", ARCH = "Archivio", ARTIST = "Artista", CONTACT = "Contatti";
+  const ALL = "Tutte le opere", ARCH = "Archivio", ARTIST = "Artista", CONTACT = "Contatti", PRIVACY = "Privacy policy";
   // pagine semplici: nome mostrato nel percorso, indirizzo e voce del menu
-  const PAGES = { [ARCH]: { hash: "archivio", link: "archLink" }, [ARTIST]: { hash: "artista", link: "artLink" }, [CONTACT]: { hash: "contatti", link: "conLink" } };
+  const PAGES = { [ARCH]: { hash: "archivio", link: "archLink" }, [ARTIST]: { hash: "artista", link: "artLink" }, [CONTACT]: { hash: "contatti", link: "conLink" }, [PRIVACY]: { hash: "privacy-policy" } };
   const ARTIST_TEXT = ["Il percorso artistico di Marco Magnani affonda le sue radici nei contesti culturali di Lucca e nelle atmosfere sospese di Salsomaggiore Terme, luoghi che hanno nutrito la sua sensibilità visiva fin dagli esordi. La sua formazione è quella di un autodidatta che ha saputo trasformare un talento naturale in una disciplina ferrea: un percorso di ricerca autonoma che, lontano dai binari accademici tradizionali, lo ha portato ad attraversare generi e linguaggi, per decodificarli e ricomporli in una firma estetica rigorosa. Lungi dall’essere un limite, questa libertà d’origine ha consentito all'artista di elevare l'istinto a un protocollo metodologico assoluto, affinato in anni di dedizione ossessiva alla tecnica e alla tenuta strutturale del dipinto. È da questo lungo processo di maturazione che è nata la sua attuale cifra stilistica, un linguaggio capace di sintetizzare la memoria della forma classica con l'esigenza di una presenza contemporanea.", "Ogni manufatto emerge da una struttura disegnata netta e definita, sviluppandosi attraverso una stratificazione paziente di velature sottili e sovrapposte. Questa tecnica antica eleva la superficie pittorica, conferendole una profondità cromatica che impone allo sguardo una sosta solenne.", "In questa indagine, la percezione occupa un ruolo centrale. Magnani opera una divinizzazione del figurativo e definisce una nuova grammatica della figura attraverso un impianto basato sulla sottrazione, sull'isolamento del soggetto e sull'equilibrio delle superfici. La sua ricerca supera il dato puramente pittorico per farsi progettuale: la tela diventa lo spazio di un’interazione in cui l'elemento figurativo e la densità del pigmento si fondono in una sintesi strutturale impeccabile.", "I soggetti vengono estratti dal contesto quotidiano per essere trasfigurati in icone contemporanee, spesso schermati o ridefiniti da filtri materici, geometrie e textures che si configurano come un varco sensoriale. L’inserto materico agisce come diaframma e perimetro, uno strumento per ridefinire i volumi, attutire il rumore del mondo esterno e proteggere l'intimità del pensiero.", "Le figure manifestano una staticità deliberata; prive di narrazione o movimento, esse affermano la propria forza nell'essere, non nel fare, generando una fissità cerimoniale capace di sospendere la dimensione temporale.", "In un’epoca dominata dall’immateriale, Marco Magnani riafferma la necessità di oggetti dotati di una forte presenza fisica e materica, capaci di abitare e nobilitare gli ambienti. Integrare una sua opera nel proprio spazio significa accogliere un’icona di silenzio e rigore formale. Il lavoro dell’artista si muove sulla soglia sottile tra l’evidenza del volto e la difesa dell’identità: le figure non si offrono allo sguardo in modo immediato, ma reclamano attenzione, celebrando il valore del limite in un mondo saturo di esposizione visiva.", "La profondità delle campiture assolute e la precisione dell’innesto materico trasformano ogni tela in un fondamento architettonico, un atto di resistenza contro la fretta che permette alle opere di dialogare con naturalezza sia con i contesti curatoriali d'avanguardia, sia con i volumi dell'architettura d'interni di alto profilo.", "L'arte non viene confinata ai circuiti convenzionali, ma diviene un’esperienza viva e atemporale: un compagno di vita silenzioso che definisce il perimetro estetico degli spazi, dedicato a chi comprende che la vera forza di un’immagine risiede nella sua capacità di custodire un segreto."];
   function pageCrumbs(name, right) {
     const crumbs = el("nav", "lv-crumbs");
@@ -1099,7 +1330,7 @@
     fig.append(img("artista/02.jpg", "Dettaglio di un dipinto in lavorazione"), img("artista/03.jpg", "Dettaglio di un'opera delle Trame del silenzio"));
     text.append(portrait, ...T.slice(0, 2).map(t => el("p", null, t)), fig, ...T.slice(2).map(t => el("p", null, t)));
     wrap.append(side, text);
-    listView.replaceChildren(pageCrumbs(ARTIST), wrap, el("div", "lv-foot"));
+    listView.replaceChildren(pageCrumbs(ARTIST), wrap, ...siteFoot());
   }
   function renderContacts() {
     currentSeries = CONTACT; markCurrent();
@@ -1115,14 +1346,82 @@
       pageCrumbs(CONTACT),
       row("Studio", "Marco Magnani", el("br"), "Via Milite Ignoto, 6", el("br"), "Salsomaggiore Terme (PR), Italia"),
       row("Telefono e WhatsApp", link(`https://wa.me/${WA}`, PHONE, true)),
-      row("Email", link("mailto:marcomagnani.solius@gmail.com", "marcomagnani.solius@gmail.com")),
-      el("div", "lv-foot")
+      row("Email", link("mailto:" + EMAIL, EMAIL)),
+      row("Social", ...socialLinks(link, true)),
+      row("Partita IVA", PIVA || "da inserire"),
+      ...siteFoot()
     );
+  }
+  // social e partita IVA: come nel menu del sito attuale
+  const EMAIL = "marcomagnani.solius@gmail.com";
+  const PIVA = "01939090344";
+  const SOCIALS = [["Instagram", "https://www.instagram.com/marcomagnaniart/", "@marcomagnaniart"], ["Facebook", "https://www.facebook.com/profile.php?id=61576975213485", "Marco Magnani Art"]];
+  const SOC_ICONS = {
+    Instagram: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="0.9" fill="currentColor" stroke="none"/></svg>',
+    Facebook: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M13.5 21v-7.6h2.6l.4-3h-3V8.5c0-.9.3-1.5 1.5-1.5h1.6V4.3c-.3 0-1.2-.1-2.3-.1-2.3 0-3.9 1.4-3.9 4v2.2H7.8v3h2.6V21h3.1z"/></svg>'
+  };
+  // nome utente con l'icona davanti; stacked = uno sotto l'altro (pagina Contatti)
+  function socialLinks(link, stacked) {
+    const out = [];
+    SOCIALS.forEach(([name, href, user], i) => {
+      if (i) out.push(stacked ? el("br") : el("span", "sep", " · "));
+      const x = link(href, user, true);
+      x.classList.add("soc");
+      x.setAttribute("aria-label", name + " " + user);
+      x.insertAdjacentHTML("afterbegin", SOC_ICONS[name] || "");
+      out.push(x);
+    });
+    return out;
+  }
+  // footer minimale in fondo a ogni pagina: recapiti, social, privacy, partita IVA
+  function siteFoot() {
+    const f = el("footer", "site-foot");
+    const a = (href, text, ext) => { const x = el("a", null, text); x.href = href; if (ext) { x.target = "_blank"; x.rel = "noopener"; } return x; };
+    const left = el("p");
+    left.append("© " + new Date().getFullYear() + " Marco Magnani", el("span", "sep", " · "), "Via Milite Ignoto, 6, Salsomaggiore Terme (PR)", el("span", "sep", " · "), "P.IVA " + (PIVA || "—"));
+    const right = el("p");
+    const priv = a("#privacy-policy", "Privacy policy");
+    priv.addEventListener("click", e => { e.preventDefault(); showSeries(PRIVACY); });
+    right.append(a(`https://wa.me/${WA}`, "WhatsApp", true), el("span", "sep", " · "), a("mailto:" + EMAIL, "Email"), el("span", "sep", " · "), ...socialLinks(a), el("span", "sep", " · "), priv);
+    f.append(left, right);
+    return [el("div", "foot-fill"), f, el("div", "lv-foot")];
+  }
+  const PRIVACY_TEXT = [
+    ["", ["La presente informativa descrive come vengono raccolti, utilizzati e protetti i dati personali degli utenti che visitano il sito Marco Magnani Art, in conformità con il Regolamento UE 2016/679 (GDPR)."]],
+    ["1. Titolare del trattamento", ["Il Titolare del trattamento è Marco Magnani, residente in Salsomaggiore Terme, Via Milite Ignoto 6, email: marcomagnani.solius@gmail.com."]],
+    ["2. Tipologia di dati raccolti", ["A seguito di un acquisto tramite PayPal o di una richiesta di contatto, verranno trattati i seguenti dati:", [["Dati identificativi:", "Nome, cognome."], ["Dati di contatto:", "Indirizzo email, numero di telefono (se fornito)."], ["Dati di spedizione:", "Indirizzo completo di destinazione (ricevuto direttamente da PayPal al momento della transazione)."]]]],
+    ["3. Finalità del trattamento", ["I dati sono raccolti e trattati per le seguenti finalità:", [["Conclusione dell'acquisto:", "Per gestire il pagamento, preparare l'imballaggio e organizzare la spedizione dell'opera d'arte acquistata."], ["Obblighi di legge:", "Per l'emissione di fatture o ricevute e per adempiere agli obblighi fiscali e contabili."], ["Comunicazioni post-vendita:", "Per aggiornare l'acquirente sullo stato della spedizione o per inviare il Certificato di Autenticità in formato digitale."], ["Contatti:", "Per rispondere a richieste di informazioni inviate tramite email o moduli sul sito."]]]],
+    ["4. Base giuridica del trattamento", ["Il trattamento dei dati per la finalità (1) e (3) è necessario all'esecuzione del contratto di vendita. Per la finalità (2) il trattamento è necessario per adempiere a un obbligo legale.", "Per la finalità (4) si basa sul legittimo interesse del Titolare a rispondere alle richieste degli utenti."]],
+    ["5. Destinatari dei dati", ["I dati personali non saranno diffusi. Saranno comunicati esclusivamente a:", [["PayPal:", "Come fornitore del servizio di pagamento (che agisce come autonomo titolare del trattamento)."], ["Corrieri e Spedizionieri:", "Per la consegna fisica dell'opera."], ["Consulente fiscale:", "Per la gestione della contabilità e degli obblighi di legge."]]]],
+    ["6. Trasferimento dei dati", ["Dato l'utilizzo di PayPal, alcuni dati potrebbero essere trasferiti al di fuori dello Spazio Economico Europeo (SEE). Tale trasferimento avviene in conformità alle clausole contrattuali standard di PayPal per garantire la protezione dei dati."]],
+    ["7. Periodo di conservazione", ["I dati relativi agli acquisti saranno conservati per il periodo previsto dalle normative fiscali vigenti (generalmente 10 anni). I dati di contatto saranno conservati per il tempo strettamente necessario a gestire la richiesta."]],
+    ["8. Diritti dell'interessato", ["In ogni momento, l'utente può esercitare i seguenti diritti inviando una email a marcomagnani.solius@gmail.com:", [["", "Diritto di accesso ai propri dati."], ["", "Diritto di rettifica o cancellazione (oblio)."], ["", "Diritto di limitazione o opposizione al trattamento."], ["", "Diritto alla portabilità dei dati."]], "L'utente ha inoltre il diritto di proporre reclamo al Garante per la protezione dei dati personali."]],
+    ["9. Uso dei Cookie", ["Questo sito utilizza esclusivamente cookie tecnici necessari al corretto funzionamento del carrello e della procedura di acquisto. Non vengono utilizzati cookie di profilazione o di tracciamento dell'utente. I pulsanti di pagamento PayPal possono comportare l'installazione di cookie tecnici di terze parti gestiti direttamente dalla piattaforma PayPal."]]
+  ];
+  function renderPrivacy() {
+    currentSeries = PRIVACY; markCurrent();
+    const wrap = el("section", "ab");
+    const side = el("div", "ab-side");
+    const head = el("div");
+    head.append(el("h2", null, "Privacy policy"), el("p", "ab-meta", "Informativa sul trattamento dei dati personali (Art. 13 GDPR 2016/679)"));
+    side.append(head);
+    const text = el("div", "ab-text pp");
+    for (const [title, parts] of PRIVACY_TEXT) {
+      if (title) text.append(el("h3", null, title));
+      for (const part of parts) {
+        if (typeof part === "string") { text.append(el("p", null, part)); continue; }
+        const ul = el("ul");
+        for (const [b, t] of part) { const li = el("li"); if (b) li.append(el("strong", null, b), " "); li.append(t); ul.append(li); }
+        text.append(ul);
+      }
+    }
+    wrap.append(side, text);
+    listView.replaceChildren(pageCrumbs(PRIVACY), wrap, ...siteFoot());
   }
 
 
   // Archivio: opere precedenti, divise per anno (gli anni veri vanno ancora indicati: per ora tutte nel 2026 come sul sito attuale)
-  const archive = [{"y": 2026, "src": "archivio/01.jpg", "w": 1200, "h": 1200}, {"y": 2026, "src": "archivio/02.jpg", "w": 1200, "h": 1200}, {"y": 2026, "src": "archivio/03.jpg", "w": 1200, "h": 1200}, {"y": 2026, "src": "archivio/04.jpg", "w": 1200, "h": 1200}, {"y": 2026, "src": "archivio/05.jpg", "w": 797, "h": 1200}, {"y": 2026, "src": "archivio/06.jpg", "w": 788, "h": 1200}, {"y": 2026, "src": "archivio/07.jpg", "w": 1200, "h": 1199}, {"y": 2026, "src": "archivio/08.jpg", "w": 1200, "h": 1193}, {"y": 2026, "src": "archivio/09.jpg", "w": 1200, "h": 1198}, {"y": 2026, "src": "archivio/10.jpg", "w": 1200, "h": 1187}, {"y": 2026, "src": "archivio/11.jpg", "w": 1200, "h": 1200}, {"y": 2026, "src": "archivio/12.jpg", "w": 1200, "h": 1200}, {"y": 2026, "src": "archivio/13.jpg", "w": 1200, "h": 1200}, {"y": 2026, "src": "archivio/14.jpg", "w": 1200, "h": 1200}, {"y": 2026, "src": "archivio/15.jpg", "w": 1181, "h": 1200}, {"y": 2026, "src": "archivio/16.jpg", "w": 1181, "h": 1200}, {"y": 2026, "src": "archivio/17.jpg", "w": 1198, "h": 1200}, {"y": 2026, "src": "archivio/18.jpg", "w": 1200, "h": 1200}, {"y": 2026, "src": "archivio/19.jpg", "w": 989, "h": 1200}, {"y": 2026, "src": "archivio/20.jpg", "w": 989, "h": 1200}, {"y": 2026, "src": "archivio/21.jpg", "w": 1200, "h": 1189}, {"y": 2026, "src": "archivio/22.jpg", "w": 1194, "h": 1200}, {"y": 2026, "src": "archivio/23.jpg", "w": 1200, "h": 1198}, {"y": 2026, "src": "archivio/24.jpg", "w": 805, "h": 1200}, {"y": 2026, "src": "archivio/25.jpg", "w": 794, "h": 1200}, {"y": 2026, "src": "archivio/26.jpg", "w": 790, "h": 1200}, {"y": 2026, "src": "archivio/27.jpg", "w": 787, "h": 1200}, {"y": 2026, "src": "archivio/28.jpg", "w": 895, "h": 1200}, {"y": 2026, "src": "archivio/29.jpg", "w": 812, "h": 1200}, {"y": 2026, "src": "archivio/30.jpg", "w": 1200, "h": 842}];
+  const archive = [{"y": 2026, "src": "archivio/01.jpg", "w": 1200, "h": 1200, "t": "Colibrì I", "tech": "Olio su tela, 20 × 20 × 3.8 cm", "desc": ["In questa serie di oli su tela, Marco Magnani indaga l'energia cinetica del colibrì, assumendolo come fulcro di uno studio sul movimento e sulla resilienza della forma. L'artista struttura l'opera attraverso contrasti netti: la stasi cromatica dello sfondo – un ottanio profondo o un bordeaux vellutato – accoglie la frequenza dinamica del piumaggio iridescente.", "Ogni pennellata agisce come un frammento di luce in vibrazione sulla tela, estendendo la percezione del soggetto oltre i confini fisici del supporto. Un'indagine visiva che si concentra sulla precisione del microscopico e sulla resa del dettaglio naturale."], "avail": true, "side": "archivio/01-lato.jpg"}, {"y": 2026, "src": "archivio/02.jpg", "w": 1200, "h": 1200, "t": "Colibrì II", "tech": "Olio su tela, 20 × 20 × 3.8 cm", "desc": ["In questa serie di oli su tela, Marco Magnani indaga l'energia cinetica del colibrì, assumendolo come fulcro di uno studio sul movimento e sulla resilienza della forma. L'artista struttura l'opera attraverso contrasti netti: la stasi cromatica dello sfondo – un ottanio profondo o un bordeaux vellutato – accoglie la frequenza dinamica del piumaggio iridescente.", "Ogni pennellata agisce come un frammento di luce in vibrazione sulla tela, estendendo la percezione del soggetto oltre i confini fisici del supporto. Un'indagine visiva che si concentra sulla precisione del microscopico e sulla resa del dettaglio naturale."], "avail": true, "side": "archivio/02-lato.jpg"}, {"y": 2026, "src": "archivio/03.jpg", "w": 1200, "h": 1200, "t": "Colibrì III", "tech": "Olio su tela, 20 × 20 × 3.8 cm", "desc": ["In questa serie di oli su tela, Marco Magnani indaga l'energia cinetica del colibrì, assumendolo come fulcro di uno studio sul movimento e sulla resilienza della forma. L'artista struttura l'opera attraverso contrasti netti: la stasi cromatica dello sfondo – un ottanio profondo o un bordeaux vellutato – accoglie la frequenza dinamica del piumaggio iridescente.", "Ogni pennellata agisce come un frammento di luce in vibrazione sulla tela, estendendo la percezione del soggetto oltre i confini fisici del supporto. Un'indagine visiva che si concentra sulla precisione del microscopico e sulla resa del dettaglio naturale."], "avail": false, "side": "archivio/03-lato.jpg"}, {"y": 2026, "src": "archivio/04.jpg", "w": 1200, "h": 1200, "t": "Colibrì IV", "tech": "Olio su tela, 20 × 20 × 3.8 cm", "desc": ["In questa serie di oli su tela, Marco Magnani indaga l'energia cinetica del colibrì, assumendolo come fulcro di uno studio sul movimento e sulla resilienza della forma. L'artista struttura l'opera attraverso contrasti netti: la stasi cromatica dello sfondo – un ottanio profondo o un bordeaux vellutato – accoglie la frequenza dinamica del piumaggio iridescente.", "Ogni pennellata agisce come un frammento di luce in vibrazione sulla tela, estendendo la percezione del soggetto oltre i confini fisici del supporto. Un'indagine visiva che si concentra sulla precisione del microscopico e sulla resa del dettaglio naturale."], "avail": false, "side": "archivio/04-lato.jpg"}, {"y": 2026, "src": "archivio/05.jpg", "w": 797, "h": 1200, "t": "Sguardo d'ambra", "tech": "Olio su tela, 40 × 60 cm", "desc": ["L'opera propone il ritratto di un felino bicromatico colto in un momento di staticità e sospensione. Il manto, definito da passaggi tonali saturi di luce, si innesta sulla geometria solida del basamento grigio inferiore, creando un netto contrasto volumetrico. Lo sviluppo verticale della composizione, enfatizzato dalla cornice artigianale floating in legno naturale, conferisce al dipinto un rigore contemporaneo che isola il soggetto dal tempo.", "Lo studio appartiene a una ricerca d'archivio basata su composizioni speculari e corrispondenze formali."], "avail": true, "note": "Presentata con cornice artigianale \"floating\"."}, {"y": 2026, "src": "archivio/06.jpg", "w": 788, "h": 1200, "t": "Profilo di rosso", "tech": "Olio su tela, 40 × 60 cm", "desc": ["Uno studio cromatico rigoroso incentrato sulla figura del gatto \"Red Tabby\". L'opera analizza il profilo del felino attraverso una transizione tonale controllata, dove le sfumature calde del manto tigrato si integrano con la luminosità neutra dello sfondo. La composizione, sospesa su un volume dall'eco metafisica, trova il suo limite formale in una cornice artigianale floating che ne isola e valorizza i contorni.", "Un lavoro d'archivio che testimonia la ricerca di un equilibrio tra la resa realistica del soggetto e la pulizia geometrica del design contemporaneo."], "avail": true, "note": "Presentata con cornice artigianale \"floating\"."}, {"y": 2025, "src": "archivio/07.jpg", "w": 1200, "h": 1199, "t": "Autunno", "tech": "Olio su tela, 40 × 40 cm", "desc": ["L'opera traduce il tema dell'Autunno in una riflessione sulla transizione e sulla sospensione ciclica. La figura è ridefinita dall'inserto organico di grappoli d'uva e foglie dalle tonalità ramate, mutuate dalle variazioni cromatiche della natura. La scelta di una luce radente e soffusa evidenzia la texture dell'incarnato e i riflessi ambrati dei capelli, mentre una palette terrosa e satura registra il passaggio verso una dimensione di quiete."], "avail": false}, {"y": 2025, "src": "archivio/08.jpg", "w": 1200, "h": 1193, "t": "Inverno", "tech": "Olio su tela, 40 × 40 cm", "desc": ["Toni freddi, accenti cromatici e silenzio. In questa tela d'archivio, Marco Magnani indaga la staticità dell'Inverno. L'impianto visivo gioca sul contrasto tra l'ampia massa scura del vestito e la luminosità del velo, interrotti solo dal punto di tensione visiva delle bacche rosse sulla fronte. Lo sguardo assorto e il dettaglio geometrico dell'anello convertono il ritratto in un momento di pura contemplazione intellettuale."], "avail": false}, {"y": 2025, "src": "archivio/09.jpg", "w": 1200, "h": 1198, "t": "Primavera", "tech": "Olio su tela, 40 × 40 cm", "desc": ["L'opera propone un'interpretazione della Primavera attraverso un ritratto di profilo che sintetizza il tema del risveglio naturale. La figura è sormontata da una corona di fiori di ciliegio e peonie, elementi che introducono una riflessione sulla transitorietà della bellezza.", "La conduzione pittorica si sviluppa per pennellate fluide e velature sovrapposte, dove una luce zenitale definisce i lineamenti e si integra con la materia del tessuto bianco che avvolge il collo. Lo sguardo, orientato oltre il limite della tela, accentua la dimensione contemplativa della composizione."], "avail": false}, {"y": 2025, "src": "archivio/10.jpg", "w": 1200, "h": 1187, "t": "Estate", "tech": "Olio su tela, 40 × 40 cm", "desc": ["L'opera analizza il tema dell'Estate attraverso una composizione frontale e di forte impatto visivo. Il soggetto stabilisce un dialogo diretto con l'osservatore, definendo una presenza solida e consapevole. La corona di girasoli e piccoli frutti rossi struttura l'intelaiatura superiore del volto, mentre il panneggio bianco sottostante agisce come superficie riflettente per una luce zenitale e intensa. I toni caldi dell'incarnato e il netto contrasto delle ombre registrano una precisa atmosfera luminosa, restituendo una sensazione di pienezza volumetrica."], "avail": false}, {"y": 2025, "src": "archivio/11.jpg", "w": 1200, "h": 1200, "t": "Scarabeo II", "tech": "Olio su tela, 20 × 20 × 3.8 cm", "desc": ["In questa serie, Marco Magnani indaga la figura dello scarabeo attraverso una lettura geometrica e strutturale dell'elemento naturale. L'insetto viene analizzato come una vera e propria micro-architettura di forme e colori: le corazze si sviluppano attraverso motivi complessi che richiamano la precisione delle porcellane antiche e inserti dorati dal rigore geometrico.", "Le figure emergono dal fondo scuro della tela attraverso una stesura a olio densa, dove la luce calibrata evidenzia la scomposizione dei volumi e la precisione dei dettagli."], "avail": true, "side": "archivio/11-lato.jpg"}, {"y": 2025, "src": "archivio/12.jpg", "w": 1200, "h": 1200, "t": "Scarabeo I", "tech": "Olio su tela, 20 × 20 × 3.8 cm", "desc": ["In questa serie, Marco Magnani indaga la figura dello scarabeo attraverso una lettura geometrica e strutturale dell'elemento naturale. L'insetto viene analizzato come una vera e propria micro-architettura di forme e colori: le corazze si sviluppano attraverso motivi complessi che richiamano la precisione delle porcellane antiche e inserti dorati dal rigore geometrico.", "Le figure emergono dal fondo scuro della tela attraverso una stesura a olio densa, dove la luce calibrata evidenzia la scomposizione dei volumi e la precisione dei dettagli."], "avail": true, "side": "archivio/12-lato.jpg"}, {"y": 2025, "src": "archivio/13.jpg", "w": 1200, "h": 1200, "t": "Scarabeo VII", "tech": "Olio su tela, 20 × 20 × 3.8 cm", "desc": ["In questa serie, Marco Magnani indaga la figura dello scarabeo attraverso una lettura geometrica e strutturale dell'elemento naturale. L'insetto viene analizzato come una vera e propria micro-architettura di forme e colori: le corazze si sviluppano attraverso motivi complessi che richiamano la precisione delle porcellane antiche e inserti dorati dal rigore geometrico.", "Le figure emergono dal fondo scuro della tela attraverso una stesura a olio densa, dove la luce calibrata evidenzia la scomposizione dei volumi e la precisione dei dettagli."], "avail": false, "side": "archivio/13-lato.jpg"}, {"y": 2025, "src": "archivio/14.jpg", "w": 1200, "h": 1200, "t": "Scarabeo VIII", "tech": "Olio su tela, 20 × 20 × 3.8 cm", "desc": ["In questa serie, Marco Magnani indaga la figura dello scarabeo attraverso una lettura geometrica e strutturale dell'elemento naturale. L'insetto viene analizzato come una vera e propria micro-architettura di forme e colori: le corazze si sviluppano attraverso motivi complessi che richiamano la precisione delle porcellane antiche e inserti dorati dal rigore geometrico.", "Le figure emergono dal fondo scuro della tela attraverso una stesura a olio densa, dove la luce calibrata evidenzia la scomposizione dei volumi e la precisione dei dettagli."], "avail": true, "side": "archivio/14-lato.jpg"}, {"y": 2025, "src": "archivio/15.jpg", "w": 1181, "h": 1200, "t": "Ombra felinea I", "tech": "Olio su tela, 40 × 40 cm", "desc": ["Una silhouette scura e immobile si converte in pura presenza visiva. In questa composizione d'archivio, la figura felina si staglia con un profilo netto e ieratico contro un vibrante sfondo rosso, definendo uno spazio di assoluto silenzio. L'opera si fonda sulla sottrazione e sull'essenzialità della forma, dove il soggetto si spoglia del dato realistico per diventare un punto di pura introspezione.", "Il dipinto è inserito in una cornice artigianale floating in legno: un montaggio a cassetta che isola la tela, ne rivela i bordi fisici e ne accentua la staccata monumentalità volumetrica."], "avail": false, "note": "Presentata con cornice artigianale \"floating\"."}, {"y": 2025, "src": "archivio/16.jpg", "w": 1181, "h": 1200, "t": "Ombra felinea II", "tech": "Olio su tela, 40 × 40 cm", "desc": ["Una variazione formale incentrata sulla medesima figura felina: qui la penombra si fa più densa, accentuando il senso di ritorno e di stasi. In questa tela d'archivio, la silhouette scura si contrappone con forza all'intensità di un fondo rosso saturo, innescando un dialogo serrato tra la rigorosa oscurità del profilo e la vibrazione del colore. La figura, sintetizzata in un contorno netto, si spoglia di ogni intento aneddotico per farsi pura indagine sulla densità cromatica.", "L’opera è completata da una cornice artigianale floating in legno, un montaggio a cassetta progettato per preservare i margini della tela e valorizzarne la presenza volumetrica nello spazio."], "avail": true, "note": "Presentata con cornice artigianale \"floating\"."}, {"y": 2025, "src": "archivio/17.jpg", "w": 1198, "h": 1200, "t": "Silenzio bianco", "tech": "Olio su tela, 40 × 40 cm", "desc": ["Un profilo luminoso emerge dalla penombra: una presenza plastica, sospesa sulla soglia che divide la luce dall'ombra. In questa tela d'archivio, la stesura bianca del manto si fa fulcro della composizione, staccandosi dal fondo scuro con un rigore formale ed etereo. La postura statica del felino definisce uno spazio di assoluta sospensione visiva, dove il segno pittorico si concentra sulla resa volumetrica del soggetto.", "L’opera è valorizzata da una cornice artigianale floating in legno: un montaggio a cassetta studiato per lasciare fluttuare la tela, preservandone i margini e accentuandone la tridimensionalità nello spazio."], "avail": false, "note": "Presentata con cornice artigianale \"floating\"."}, {"y": 2025, "src": "archivio/18.jpg", "w": 1200, "h": 1200, "t": "Figura in quieto", "tech": "Olio su tela, 40 × 40 cm", "desc": ["Il volume della figura si raccoglie in una sintesi geometrica e composta. Una forma definita dalla luce, che emerge dalla penombra dello sfondo con una presenza nitida, quasi scultorea. In questo studio d'archivio, l'elemento felino viene spogliato del superfluo per rivelare un momento di assoluta sottrazione e pura introspezione formale.", "L’opera trova la sua ideale estensione in una cornice artigianale floating in legno: un montaggio a cassetta progettato per isolare la tela, rivelandone i margini materici e accentuandone la tridimensionalità nello spazio."], "avail": false, "note": "Presentata con cornice artigianale \"floating\"."}, {"y": 2025, "src": "archivio/19.jpg", "w": 989, "h": 1200, "t": "Bianco su rosso I", "tech": "Olio su tavola, 30 × 36 cm", "desc": ["Questa serie di opere d'archivio indaga la monumentalità del cavallo attraverso la densità e la profondità della tecnica a olio. Il fulcro della ricerca si concentra sulla resa plastica del soggetto, qui definito in primo piano da una luce morbida e da una precisa analisi anatomica dei dettagli.", "La composizione è strutturata su un netto contrasto tonale: il candore del manto emerge con forza contro l'intensità di una campitura rossa profonda, convertendo l'elemento figurativo in una presenza scenica di assoluto rigore.", "L'opera trova il suo equilibrio finale nel dialogo materico con una cornice artigianale in legno, pensata per isolare lo spazio visivo e sottolineare la sintesi tra la classicità del tema e la contemporaneità dell'impianto cromatico."], "avail": true, "pic": "archivio/19-cornice.webp", "ar": 0.8543, "note": "Presentata con cornice artigianale in legno."}, {"y": 2025, "src": "archivio/20.jpg", "w": 989, "h": 1200, "t": "Bianco su rosso II", "tech": "Olio su tavola, 30 × 36 cm", "desc": ["Corrispondenze, variazioni speculari e rigore cromatico. Questa seconda tavola d'archivio approfondisce la serialità del soggetto, articolandosi attraverso un preciso gioco di simmetrie con l'opera precedente. Marco Magnani isola nuovamente il profilo del cavallo bianco contro l'intensità di un fondo rosso saturo, esasperando il contrasto plastico tra la figura e lo spazio vuoto.", "La cornice in legno si innesta sulla tavola definendone il limite geometrico e valorizzando l'opera sia nella sua unicità strutturale, sia all'interno del sistema visivo della serie."], "avail": true, "pic": "archivio/20-cornice.webp", "ar": 0.8521, "note": "Presentata con cornice artigianale in legno."}, {"y": 2025, "src": "archivio/21.jpg", "w": 1200, "h": 1189, "t": "Velata I", "tech": "Olio su tavola, 40 × 40 cm", "desc": ["Con Velata I, Marco Magnani conduce un’indagine sulla presenza umana attraverso una stratificazione di ombre e velature che definiscono uno spazio di assoluta sospensione. L'opera unisce la storicità dell'olio su tavola a un rigore visivo contemporaneo, dove lo studio chiaroscurale e il contrasto tonale fanno emergere il volto da uno sfondo profondo e indefinito.", "La superficie pittorica si converte in un territorio di ricerca incentrato sulla permanenza degli archetipi e sul confine tra visibile e celato, collocando l'opera in perfetto equilibrio tra la classicità del ritratto e la sintesi dell'astrazione."], "avail": false}, {"y": 2025, "src": "archivio/22.jpg", "w": 1194, "h": 1200, "t": "Velata II", "tech": "Olio su tavola, 40 × 40 cm", "desc": ["Con Velata II, l'indagine si sposta sul tema del silenzio e della staticità, declinati attraverso una figura colta in un momento di assoluta sospensione visiva. La posa composta e l'orientamento dello sguardo depurano il soggetto da ogni intenzione narrativa, convertendolo in un archetipo formale. La tecnica dell'olio su tavola si esprime in una rigorosa stratificazione delle velature, dove una luce calibrata definisce i lineamenti del volto e il dettaglio plastico della mano, creando un netto contrasto volumetrico con la densità scura dell'abito.", "Un'opera che unisce la struttura del ritratto classico alla sensibilità della ricerca pittorica contemporanea."], "avail": false}, {"y": 2025, "src": "archivio/23.jpg", "w": 1200, "h": 1198, "t": "Figura in blu", "tech": "Olio su tavola, 40 × 40 cm", "desc": ["In Figura in Blu, l’indagine si sposta su una dimensione di rigorosa sottrazione e distaccata introspezione. La figura, sintetizzata di profilo con uno sguardo orientato oltre il limite del quadro, definisce una presenza solida e composta. Il contrasto volumetrico tra le spalle nude, investite da una luce diffusa, e la densità del blu profondo dell'abito genera un impianto visivo di grande forza strutturale, capace di coniugare la solennità della ritrattistica classica a un'estetica contemporanea. La tecnica dell'olio su tavola permette una modulazione del fondo – caratterizzato da calde transizioni tonali – che enfatizza la nitidezza dei lineamenti.", "Un equilibrio compositivo dove ogni elemento, dalla postura alla scelta della tonalità dominante, concorre a creare uno spazio di assoluta sospensione."], "avail": false}, {"y": 2024, "src": "archivio/24.jpg", "w": 805, "h": 1200, "t": "Madonna con bambino", "tech": "Olio su tavola, 80 × 120 cm", "desc": ["L'opera reinterpreta l’iconografia sacra attraverso una sintesi formale che coniuga la ieraticità della tradizione bizantina alle soluzioni decorative della Secessione Viennese. La composizione struttura uno spazio di assoluta sospensione, dove la figura materna, avvolta in un abito verde dai pattern geometrici, accoglie il Bambino dormiente emergendo per contrasto da una vibrante campitura rosso-arancio. Il linguaggio visivo si fonda sul dialogo tra l'inserto dorato di matrice klimtiana e una stesura a olio densa e materica.", "La scelta di esporre la tavola priva di cornice azzera la mediazione con lo spazio circostante, valorizzando la fisicità del supporto ligneo e l’autonomia della superficie pittorica come luogo di persistenza degli archetipi."], "avail": false}, {"y": 2024, "src": "archivio/25.jpg", "w": 794, "h": 1200, "t": "Thea", "tech": "Olio su tela, 80 × 120 cm", "desc": ["Una riflessione sulla continuità formale tra figura femminile e mondo organico. La composizione integra il soggetto all'elemento naturale, sviluppando un intreccio lineare tra la capigliatura e i rami retrostanti. Lo sguardo, teso tra vulnerabilità e assertività, definisce una presenza sospesa. La tecnica dell'olio si articola attraverso una gamma di toni verdi e terrosi, strutturando un fondo profondo da cui emerge, per contrasto tonale, la luminosità dell'incarnato.", "Le pennellate si fanno dense e materiche nella definizione dei petali gialli, intercettando la luce e restituendo una qualità tattile che conferisce preziosità alla superficie del tessuto."], "avail": true}, {"y": 2024, "src": "archivio/26.jpg", "w": 790, "h": 1200, "t": "Lea", "tech": "Olio su tela, 80 × 120 cm", "desc": ["In quest'opera, la figura di Lea viene strutturata attraverso un dinamismo formale e lineare. La capigliatura ramata si sviluppa in volute fluide che definiscono un senso di movimento e sospensione, mentre l'orientamento del volto verso l'alto sposta la composizione verso una dimensione di pura introspezione. L'artista sfrutta le proprietà dell'olio per generare un netto contrasto tra la definizione plastica dei lineamenti e la stesura quasi astratta dello sfondo.", "La campitura gialla dell'abito acquista vibrazione e luminosità attraverso una stratificazione controllata di velature, mentre gli elementi circolari sullo sfondo – risolti con passaggi sfumati e morbidi – determinano la profondità tridimensionale della scena."], "avail": true}, {"y": 2024, "src": "archivio/27.jpg", "w": 787, "h": 1200, "t": "Il filo della memoria", "tech": "Olio su tela, 80 × 120 cm", "desc": ["Una composizione incentrata sulla stasi e sulla concentrazione formale all'interno dello spazio. La figura è collocata in un ambiente interno, definita da una postura reclinata che esclude ogni dinamismo per favorire una dimensione di assoluta sospensione. L'opera si fonda su una rigorosa gestione del chiaroscuro: una sorgente luminosa laterale e direzionale investe il panneggio bianco della camicia, articolandosi in una complessa gamma di transizioni tonali, tra grigi intermedi e bianchi caldi.", "L'inserto cromatico dei grani rossi agisce come unico accento puro all'interno della composizione, strutturando un preciso punto focale che interrompe la severità monocroma dei bruni e degli azzurrati della stanza."], "avail": true}, {"y": 2024, "src": "archivio/28.jpg", "w": 895, "h": 1200, "t": "L'orgoglio della notte", "tech": "Olio su tavola, 55 × 70 cm", "desc": ["Una composizione improntata sul rigore plastico e sulla monumentalità della figura. Il soggetto, definito da un'acconciatura scultorea, indossa un abito dalla complessa architettura sartoriale, strutturato sul contrasto visivo tra il volume fluido delle maniche e la rigidità geometrica del busto. L'opera si distingue per una gestione controllata delle ombre profonde: le tonalità scure del corsetto e dello sfondo evitano la piattezza del nero puro, risolvendosi in una stratificazione di blu e bruni che conferisce densità all'oscurità.", "Il bianco delle maniche è risolto attraverso una stesura alla prima, con segni decisi che restituiscono la trasparenza e la leggerezza del tessuto, creando un netto distacco materico con la levigatezza analitica dell'incarnato."], "avail": true}, {"y": 2024, "src": "archivio/29.jpg", "w": 812, "h": 1200, "t": "Aura", "tech": "Olio su tela, 80 × 120 cm", "desc": ["L'opera analizza la figura femminile inserendola sulla linea di transizione tra lo spazio atmosferico e lo specchio d'acqua. La postura, caratterizzata dall'estensione del volto e dagli occhi serrati, azzera la componente narrativa per focalizzarsi su una dimensione di assoluta sospensione e armonia con l'ambiente circostante. L'uso controllato della tecnica a olio permette una fusione osmotica tra il volume del corpo e l'elemento naturale. La luce, proiettata in controluce, trasforma il panneggio bianco in un sistema di trasparenze e modulazioni argentee.", "Nel registro inferiore, il segno pittorico si fa fluido e rigorosamente orizzontale, sintetizzando il moto ondoso e i riflessi dorati del crepuscolo. Il contrasto tra la densità violacea delle nubi superiori e la radiosità zenitale che isola il capo definisce una composizione dal rigore solenne."], "avail": true}, {"y": 2024, "src": "archivio/30.jpg", "w": 1200, "h": 842, "t": "Sguardi complici", "tech": "Olio su tela, 70 × 50 cm", "desc": ["L'opera struttura un’atmosfera interna definita da un rigore compositivo in cui la figura femminile e la presenza felina coabitano all'interno dello stesso piano visivo. La postura statica del soggetto si integra con una complessa ricerca ornamentale, che traduce i tessuti e l'abito in un mosaico di texture e motivi geometrici di matrice secessionista. La tecnica pittorica si fonda sul contrasto controllato tra l'assolutezza delle campiture di sfondo e la densità materica dei dettagli in primo piano, dalla precisione dei pizzi alla struttura dei gioielli.", "Un equilibrio cromatico che azzera la componente aneddotica per generare uno spazio di assoluta sospensione formale."], "avail": true}];
   function renderArchive() {
     currentSeries = ARCH;
     markCurrent();
@@ -1140,42 +1439,63 @@
       bar.append(el("h2", null, String(y)), el("span", null, countLabel(items.length)));
       nodes.push(bar);
       items.forEach((a, k) => {
-        const n = String(archive.indexOf(a) + 1).padStart(2, "0");
         const row = el("article", "lv-row");
         const art = el("div", "lv-art");
-        const img = el("img", "lv-img");
-        img.src = a.src; img.width = a.w; img.height = a.h; img.loading = "lazy"; img.decoding = "async";
-        img.alt = `Opera ${n} dall'archivio, ${y}`;
-        const ratio = a.w / a.h;
-        img.style.width = `min(100%, ${ratio >= 1 ? 520 : 400}px, calc(var(--art-vh) * ${ratio.toFixed(4)}))`;
-        art.append(img);
+        const ratio = a.ar || a.w / a.h;
+        const size = `min(100%, ${ratio >= 1 ? 520 : 400}px, calc(var(--art-vh) * ${ratio.toFixed(4)}))`;
+        if (a.side) {
+          // tele a spessore (colibrì, scarabei): foto di fronte e di profilo, con le frecce come per i gatti
+          const box = el("div", "lv-box");
+          box.style.aspectRatio = String(ratio); box.style.width = size;
+          makeSlides(box, { t: a.t, img: a.src, side: a.side }, "#e4e4e2");
+          art.append(box);
+        } else {
+          const img = el("img", "lv-img");
+          img.src = a.pic || a.src; img.width = a.w; img.height = a.h; img.loading = "lazy"; img.decoding = "async";
+          if (a.pic) { img.classList.add("framed-pic"); img.removeAttribute("width"); img.removeAttribute("height"); img.style.aspectRatio = String(ratio); } // venduto con la cornice: si vede nella foto
+          img.alt = `${a.t}, ${a.tech}`;
+          img.style.width = size;
+          art.append(img);
+        }
         const info = el("div", "lv-info");
-        const cta = el("a", "lv-cta", "Richiedi informazioni");
-        cta.href = `https://wa.me/${WA}?text=${encodeURIComponent(`Buongiorno, vorrei informazioni sull'opera n. ${n} dell'archivio ${y}.`)}`;
-        cta.target = "_blank"; cta.rel = "noopener";
-        info.append(el("p", "lv-kicker", `Archivio ${y}`), el("h3", null, `Opera ${n}, ${y}`), el("p", null, "Olio su tela"), cta);
+        info.append(el("h3", null, a.t), el("p", null, a.tech));
+        if (a.note) info.append(el("p", "lv-note", a.note)); // cornice: subito sotto la tecnica
+        if (a.avail) {
+          const cta = el("a", "lv-cta", "Richiedi informazioni");
+          cta.href = `https://wa.me/${WA}?text=${encodeURIComponent(`Buongiorno, vorrei informazioni sull'opera "${a.t}" (Archivio ${y}).`)}`;
+          cta.target = "_blank"; cta.rel = "noopener";
+          info.append(cta);
+        } else info.append(el("p", "lv-sold", "Già in collezione privata"));
+        const desc = el("div", "lv-desc");
+        desc.append(...a.desc.map(t => el("p", null, t))); // archivio: descrizione sempre intera, identica al sito, senza "Leggi tutto"
+        info.append(desc);
         row.append(art, info);
         if (rowObserver) { row.classList.add("pre"); rowObserver.observe(row); }
         nodes.push(row);
       });
     }
-    nodes.push(el("div", "lv-foot"));
+    nodes.push(...siteFoot());
     listView.replaceChildren(...nodes);
   }
   const viewBtns = [...document.querySelectorAll(".view-switch button")];
-  function markSwitch() {
-    const v = listOpen && currentSeries === ALL ? "lista" : !listOpen ? "galleria" : "";
+  function markSwitch(next = currentSeries) {
+    const v = listOpen && next === ALL ? "lista" : !listOpen ? "galleria" : "";
     viewBtns.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
+    // Galleria/Lista solo nella galleria e in "Tutte le opere": nelle collezioni e nelle altre pagine si toglie
+    document.body.classList.toggle("no-switch", listOpen && next !== ALL);
   }
   // name = una collezione, oppure ALL per tutte le opere nell'ordine della galleria
   function renderSeries(name) {
     if (name === ARCH) return renderArchive();
     if (name === ARTIST) return renderArtist();
     if (name === CONTACT) return renderContacts();
+    if (name === PRIVACY) return renderPrivacy();
     currentSeries = name;
     markCurrent();
     const all = name === ALL;
+    // in "Tutte le opere" le opere sono raggruppate per collezione, nell'ordine del menu
     const items = works.map((w, i) => [w, i]).filter(([w]) => all || w.s === name);
+    if (all) items.sort((a, b) => seriesOrder.indexOf(a[0].s) - seriesOrder.indexOf(b[0].s));
     const crumbs = el("nav", "lv-crumbs");
     crumbs.setAttribute("aria-label", "Percorso");
     const home = el("button", null, "Galleria");
@@ -1183,38 +1503,72 @@
     home.addEventListener("click", () => goGallery());
     crumbs.append(home, el("i", null, "›"), el("span", null, name), el("span", "lv-count", countLabel(items.length)));
     const nodes = [crumbs];
-    for (const [w, i] of items) {
+    const polyRow = () => {
       const row = el("article", "lv-row");
+      row.id = "opera-" + fileSlug(POLYWORK.t);
       const art = el("div", "lv-art");
       const box = el("div", "lv-box");
-      const ratio = w.w / w.h;
-      box.style.background = `${hexOf(i)} url("${w.img}") center / cover no-repeat`;
-      box.style.aspectRatio = `${w.w} / ${w.h}`;
-      // in scala: le tele piccole restano piccole, le grandi crescono (con un limite in altezza)
-      box.style.width = `min(100%, ${ratio >= 1 ? 520 : 400}px, calc(var(--art-vh) * ${ratio.toFixed(4)}))`; // stessa misura della scheda
-      box.setAttribute("role", "img"); box.setAttribute("aria-label", w.t);
+      box.style.background = `#151515 url("${POLYWORK.img}") center / cover no-repeat`;
+      box.style.aspectRatio = "1 / 1";
+      box.style.width = "min(100%, 520px, calc(var(--art-vh) * 1))";
+      box.setAttribute("role", "img"); box.setAttribute("aria-label", "Le quattro tele di Trame nella loro cornice");
       art.append(box);
       const info = el("div", "lv-info");
-      if (all) info.append(el("p", "lv-kicker", w.s));
+      info.append(
+        el("h3", null, "Trame, polittico, 2026"),
+        el("p", null, "Olio su tela, quattro elementi 40 × 40 cm")
+      );
+      const a = el("a", "lv-cta", "Richiedi informazioni");
+      a.href = `https://wa.me/${WA}?text=${encodeURIComponent(`Buongiorno, vorrei informazioni sul polittico "${POLY}" con la cornice.`)}`;
+      a.target = "_blank"; a.rel = "noopener";
+      info.append(a, el("p", "lv-mount mount-gap", "Le quattro opere presentate insieme, nella loro cornice."));
+      row.append(art, info);
+      if (rowObserver) { row.classList.add("pre"); rowObserver.observe(row); }
+      return row;
+    };
+    if (name === POLY) nodes.push(polyRow());
+    let lastSeries = null;
+    for (const [w, i] of items) {
+      if (all && w.s !== lastSeries) {
+        lastSeries = w.s;
+        const bar = el("div", "lv-year");
+        bar.append(el("h2", null, w.s), el("span", null, countLabel(works.filter(x => x.s === w.s).length)));
+        nodes.push(bar);
+        if (w.s === POLY) nodes.push(polyRow());
+      }
+      const row = el("article", "lv-row");
+      row.id = "opera-" + fileSlug(w.t);
+      const art = el("div", "lv-art");
+      const box = el("div", "lv-box");
+      const ratio = w.ar || w.w / w.h;
+      box.style.background = `${hexOf(i)} url("${w.pic}") center / cover no-repeat`;
+      box.style.aspectRatio = String(ratio);
+      // in scala: le tele piccole restano piccole, le grandi crescono (con un limite in altezza)
+      box.style.width = `min(100%, ${ratio >= 1 ? 520 : 400}px, calc(var(--art-vh) * ${ratio.toFixed(4)}))`; // stessa misura della scheda
+      makeSlides(box, w, hexOf(i));
+      if (w.ar) box.classList.add("framed-pic");
+      art.append(box);
+      const info = el("div", "lv-info");
       info.append(
         el("h3", null, `${w.t}, 2026`),
         el("p", null, w.tech)
       );
-      const desc = el("div", "lv-desc");
-      desc.append(...descParts(w.desc));
-      info.append(desc);
-      if (w.mount) info.append(el("p", "lv-mount", w.mount));
+      if (w.note) info.append(el("p", "lv-note", w.note)); // nota sulla cornice, subito sotto la tecnica
       if (w.avail) {
         const a = el("a", "lv-cta", "Richiedi informazioni");
         a.href = `https://wa.me/${WA}?text=${encodeURIComponent(`Buongiorno, vorrei informazioni sull'opera "${w.t}" (${w.s}).`)}`;
         a.target = "_blank"; a.rel = "noopener";
         info.append(a);
       } else info.append(el("p", "lv-sold", "Già in collezione privata"));
+      const desc = el("div", "lv-desc");
+      desc.append(...descParts(w.desc));
+      info.append(desc);
+      if (w.mount) info.append(el("p", "lv-mount", w.mount));
       row.append(art, info);
       if (rowObserver) { row.classList.add("pre"); rowObserver.observe(row); }
       nodes.push(row);
     }
-    nodes.push(el("div", "lv-foot"));
+    nodes.push(...siteFoot());
     listView.replaceChildren(...nodes);
   }
 
@@ -1228,14 +1582,28 @@
 
   // apre una collezione: dalla galleria con una dissolvenza, da un'altra collezione cambiando il contenuto
   let swapTimer = 0;
-  function showSeries(name, fromHash) {
-    if (sheetOpen) return;
+  function scrollToWorkNow(work) {
+    const row = document.getElementById("opera-" + fileSlug(work.t));
+    if (!row) return;
+    row.classList.remove("pre");
+    listView.scrollTop = row.getBoundingClientRect().top - listView.getBoundingClientRect().top + listView.scrollTop - siteHeader.offsetHeight;
+  }
+  function scrollToWork(work) {
+    const row = work && document.getElementById("opera-" + fileSlug(work.t));
+    if (!row) return;
+    const top = row.getBoundingClientRect().top - listView.getBoundingClientRect().top + listView.scrollTop - siteHeader.offsetHeight;
+    listView.scrollTo({ top, behavior: reduceMotion ? "auto" : "smooth" });
+  }
+  function showSeries(name, fromHash, work) {
+    // dal menu con la scheda aperta: si chiude la scheda e si va dritti alla pagina scelta
+    if (sheetOpen) { if (!camAnim) sheetToSeries(name, work); return; }
     if (!fromHash) try { history.pushState(null, "", name === ALL ? "#lista" : PAGES[name] ? "#" + PAGES[name].hash : "#collezioni/" + slug(name)); } catch (e) {}
     clearTimeout(swapTimer);
-    if (!listOpen) { renderSeries(name); listView.scrollTop = 0; setListOpen(true); markSwitch(); return; }
-    if (name === currentSeries) { listView.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" }); return; }
-    markSwitch();
-    const swap = () => { renderSeries(name); listView.scrollTop = 0; listView.style.opacity = ""; markSwitch(); };
+    const jump = () => { if (work) scrollToWorkNow(work); };
+    if (!listOpen) { renderSeries(name); fitDescs(listView); listView.scrollTop = 0; jump(); setListOpen(true); markSwitch(); return; }
+    if (name === currentSeries) { if (work) scrollToWork(work); else listView.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" }); return; }
+    markSwitch(name);
+    const swap = () => { renderSeries(name); fitDescs(listView); listView.scrollTop = 0; jump(); listView.style.opacity = ""; markSwitch(); };
     if (reduceMotion) return swap();
     listView.style.opacity = "0";
     swapTimer = setTimeout(swap, 260);
@@ -1258,7 +1626,7 @@
     else goGallery(true);
   }
   addEventListener("popstate", applyHash);
-  for (const [name, pg] of Object.entries(PAGES))
+  for (const [name, pg] of Object.entries(PAGES)) if (pg.link)
     document.getElementById(pg.link).addEventListener("click", e => { e.preventDefault(); setColl(false); setMenu(false); showSeries(name); });
   viewBtns.forEach(b => b.addEventListener("click", () => { setColl(false); b.dataset.view === "lista" ? showSeries(ALL) : goGallery(); }));
 
@@ -1350,7 +1718,7 @@
     const key = layoutKey();
     if (focus && activeGroup && key === currentKey) {
       // schermo ridimensionato con la scheda aperta: il quadro resta allineato al suo riquadro
-      focusPose(activeGroup, artBox.getBoundingClientRect(), poseB);
+      focusPose(activeGroup, targetRect(), poseB);
     }
     if (key === currentKey) return;
     if (sheetOpen) { sheet.classList.remove("open"); closeBtn.hidden = true; focus = null; camAnim = null; activeGroup = null; sheetOpen = false; }
